@@ -20,7 +20,7 @@
 	 * Because markdown is relatively easy to read and edit, the user can make simple changes without struggling with hundreds of messy HTML tags.
 	 * If necessary, **Remark** can accept this input as well, and strip any HTML tags for security.
 
-# Advanced Features
+## Advanced Features
 
 **Remark** can be configured to output extra functionality beyond straight markdown.
 
@@ -42,6 +42,13 @@
 
 The basic theory is that you match the extensions to your Markdown conversion library.
 
+---
+
+## A Note on Forking:
+
+Want to fork this project?  *Great!*  However, please note that I use [hglfow][] to manage the develop-release cycle.  If you are uncomfortable with that, that's fine, too!  Just switch to the **develop** branch before working, or I won't be able to easily merge the changes back in.
+
+Source code build is done via [Gradle][].
 
 [Markdown]: http://daringfireball.net/projects/markdown/
 [Markdown Extra]: http://michelf.com/projects/php-markdown/extra/
@@ -55,7 +62,5 @@ The basic theory is that you match the extensions to your Markdown conversion li
 [dojo_rte]: http://dojotoolkit.org/reference-guide/dijit/Editor.html
 [other_rtes]: http://www.queness.com/post/212/10-jquery-and-non-jquery-javascript-rich-text-editors
 [jsoup]: http://jsoup.org/
-
-*[HTML]: HyperText Markup Language
-*[GUI]: Graphical User Interface
-*[XSS]: Cross Site Scripting
+[hgflow]: https://bitbucket.org/yinwm/hgflow/wiki/Home
+[Gradle]: http://gradle.org/

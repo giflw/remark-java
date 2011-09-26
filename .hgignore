@@ -1,0 +1,3 @@
+glob:build/*
+.idea/workspace.xml
+.gradle/*
