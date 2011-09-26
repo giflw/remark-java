@@ -1,0 +1,103 @@
+apply plugin: 'java'
+
+//---------------------------------------------------------------------------
+// Base properties
+//---------------------------------------------------------------------------
+
+sourceCompatibility = 1.5
+version = '0.0.1'
+
+//---------------------------------------------------------------------------
+// Dependencies
+//---------------------------------------------------------------------------
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.6.+'
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+//---------------------------------------------------------------------------
+// Override default tasks
+//---------------------------------------------------------------------------
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.overzealous.remark.Remark'
+    }
+}
+
+
+
+//---------------------------------------------------------------------------
+// Custom tasks
+//---------------------------------------------------------------------------
+
+task(runRemark, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.overzealous.remark.Remark'
+    classpath = sourceSets.main.runtimeClasspath
+    //args ''
+    //systemProperty 'simple.message', 'Hello '
+}
+
+
+task intellijSync << {
+    description = 'Add gradle dependecies to IntelliJ project library'
+
+    final def librariesDir = new File(".idea${File.separator}libraries")
+    librariesDir.mkdirs()
+
+    final def userHomeGradle = project.gradle.gradleUserHomeDir
+    println "Set the USER_HOME_GRADLE variable to '$userHomeGradle.path'"
+
+    def makeJarList = { path ->
+        path.split(File.pathSeparator).collect {
+            it.replaceAll userHomeGradle.path, "\\\$USER_HOME_GRADLE\\\$"
+        }
+    }
+    final def compileJars = makeJarList(configurations.compile.asPath)
+    final def testJars = makeJarList(configurations.testCompile.asPath) - compileJars
+
+    def createLibrary = { fileName, libraryName, jars ->
+        final def gradleLibXml = new File(librariesDir, fileName)
+        gradleLibXml.write """
+<component name="libraryTable">
+<library name="$libraryName"/>
+</component>"""
+        final def xmlRoot = new XmlParser().parse(gradleLibXml)
+        final def classesNode = xmlRoot.library[0].appendNode('CLASSES')
+
+        jars.each { jar ->
+            classesNode.appendNode('root', [url: "jar://$jar!/"])
+        }
+
+        def writer = new StringWriter()
+        new XmlNodePrinter(new PrintWriter(writer)).print(xmlRoot)
+        gradleLibXml.write writer.toString()
+        println "File '${gradleLibXml.path}' updated"
+    }
+    createLibrary 'Gradle_Libraries.xml', 'Gradle Libraries', compileJars
+    createLibrary 'Gradle_Test_Libraries.xml', 'Gradle Test Libraries', testJars
+}
+
+/*
+task intellijModuleSync(dependsOn: intellijSync) << {
+    final def moduleFile = new File('your-module-here.iml') // TODO rename to match your module's name
+    def root = new XmlParser().parse(moduleFile)
+    def newModuleRootManager = root.component.find {it.'@name' == 'NewModuleRootManager'}
+    def orderEntry = newModuleRootManager.orderEntry.find {
+        it.'@type' == 'library' && it.'@name' == GRADLE_TEST_LIBRARIES_ID
+    }
+    if (orderEntry) {
+        newModuleRootManager.remove(orderEntry)
+    }
+    newModuleRootManager.appendNode('orderEntry', [type: 'library', scope: 'TEST', name: GRADLE_TEST_LIBRARIES_ID, level: 'project'])
+
+    def writer = new StringWriter()
+    new XmlNodePrinter(new PrintWriter(writer)).print(root)
+    moduleFile.write writer.toString()
+    println "File '${moduleFile.path}' updated"
+}
+*/
