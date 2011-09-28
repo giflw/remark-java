@@ -3,6 +3,7 @@
     <CLASSES>
       <root url="jar://$USER_HOME_GRADLE$/cache/junit/junit/jars/junit-4.9.jar!/" />
       <root url="jar://$USER_HOME_GRADLE$/cache/org.hamcrest/hamcrest-core/jars/hamcrest-core-1.1.jar!/" />
+      <root url="jar://$USER_HOME_GRADLE$/cache/commons-io/commons-io/jars/commons-io-1.3.2.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
