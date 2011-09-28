@@ -9,8 +9,7 @@ import org.jsoup.nodes.Document;
 public class Remark {
 
 	public static void main(String args[]) throws Exception {
-		Document doc = Jsoup.connect("http://www.overzealous.com").get();
-		System.out.printf("Found: %s\n", doc.select("h1").get(0).text());
+		
 	}
 
 }
