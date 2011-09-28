@@ -1,11 +1,12 @@
 apply plugin: 'java'
+apply plugin: 'maven'
 
 //---------------------------------------------------------------------------
 // Base properties
 //---------------------------------------------------------------------------
 
+description = 'The OverZealous Creations Remark library.'
 sourceCompatibility = 1.5
-version = '0.0.1'
 
 //---------------------------------------------------------------------------
 // Dependencies
@@ -35,22 +36,32 @@ jar {
 // Custom tasks
 //---------------------------------------------------------------------------
 
-task(runRemark, dependsOn: 'classes', type: JavaExec) {
+task runRemark(dependsOn: 'classes', type: JavaExec, description: "Runs the command-line Remark class") << {
     main = 'com.overzealous.remark.Remark'
     classpath = sourceSets.main.runtimeClasspath
     //args ''
     //systemProperty 'simple.message', 'Hello '
 }
 
+task bumpVersion(description: 'Bumps the app Version for release.') << {
+	def components = version.split('\\.').collect { Integer.parseInt(it.replace('-SNAPSHOT', ''))}
+	components[2] += 1
+	def nextIntegrationVersion = components.join('.')+"-SNAPSHOT"
+	println "Bumping $version to $nextIntegrationVersion"
+	def newProps = file("gradle.properties").text.replace(version, nextIntegrationVersion)
+	file("gradle.properties").text = newProps
+}
 
-task intellijSync << {
-    description = 'Add gradle dependecies to IntelliJ project library'
+
+task intellijSync(description: 'Add gradle dependecies to IntelliJ project library') << {
 
     final def librariesDir = new File(".idea${File.separator}libraries")
     librariesDir.mkdirs()
 
     final def userHomeGradle = project.gradle.gradleUserHomeDir
-    println "Set the USER_HOME_GRADLE variable to '$userHomeGradle.path'"
+	if(!userHomeGradle) {
+    	println "Set the USER_HOME_GRADLE variable to '$userHomeGradle.path'"
+	}
 
     def makeJarList = { path ->
         path.split(File.pathSeparator).collect {
