@@ -46,9 +46,27 @@ The basic theory is that you match the extensions to your Markdown conversion li
 
 ## A Note on Forking:
 
-Want to fork this project?  *Great!*  However, please note that I use [hglfow][] to manage the develop-release cycle.  If you are uncomfortable with that, that's fine, too!  Just switch to the **develop** branch before working, or I won't be able to easily merge the changes back in.
+Want to fork this project?  *Great!*  However, please note that I use [hgflow][] to manage the develop-release cycle.  If you are uncomfortable with that, that's fine, too!  Just switch to the **develop** branch before working, or I won't be able to easily merge the changes back in.
 
 Source code build is done via [Gradle][].
+
+## License
+
+**Remark** is released under the Apache 2.0 license.
+
+	Copyright 2011 OverZealous Creations, LLC
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
 
 [Markdown]: http://daringfireball.net/projects/markdown/
 [Markdown Extra]: http://michelf.com/projects/php-markdown/extra/
