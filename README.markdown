@@ -42,17 +42,21 @@
 
 The basic theory is that you match the extensions to your Markdown conversion library.
 
----
-
 ## A Note on Forking:
 
 Want to fork this project?  *Great!*  However, please note that I use [hgflow][] to manage the develop-release cycle.  If you are uncomfortable with that, that's fine, too!  Just switch to the **develop** branch before working, or I won't be able to easily merge the changes back in.
 
 Source code build is done via [Gradle][].
 
+## Dependencies
+
+The only runtime dependency for **Remark** is [jsoup][].  jsoup uses the [MIT License][jsoup license], which is roughly comparable to the [Apache 2.0 License][] used by Remark.
+
+During testing, **Remark** also depends on some additional libraries, which are automatically downloaded by the gradle build script.
+
 ## License
 
-**Remark** is released under the Apache 2.0 license.
+**Remark** is released under the [Apache 2.0 license][].
 
 	Copyright 2011 OverZealous Creations, LLC
 
@@ -80,5 +84,7 @@ Source code build is done via [Gradle][].
 [dojo_rte]: http://dojotoolkit.org/reference-guide/dijit/Editor.html
 [other_rtes]: http://www.queness.com/post/212/10-jquery-and-non-jquery-javascript-rich-text-editors
 [jsoup]: http://jsoup.org/
+[jsoup license]: http://jsoup.org/license
 [hgflow]: https://bitbucket.org/yinwm/hgflow/wiki/Home
 [Gradle]: http://gradle.org/
+[Apache 2.0 License]: http://www.apache.org/licenses/LICENSE-2.0
