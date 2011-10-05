@@ -31,6 +31,14 @@ jar {
     }
 }
 
+javadoc {
+	configure(options) {
+		options.links = [ 'http://download.oracle.com/javase/6/docs/api/', 'http://jsoup.org/apidocs/' ]
+		options.author = true
+		options.bottom = '<div style="font-size:.75em; font-style:italic; text-align:center;">&copy; 2011 <a href="http://www.overzealous.com/">OverZealous Creations, LLC</a> - <a href="https://bitbucket.org/OverZealous/remark">BitBucket Repository</a></div>'
+	}
+}
+
 
 
 //---------------------------------------------------------------------------
@@ -93,23 +101,3 @@ task intellijSync(description: 'Add gradle dependecies to IntelliJ project libra
     createLibrary 'Gradle_Libraries.xml', 'Gradle Libraries', compileJars
     createLibrary 'Gradle_Test_Libraries.xml', 'Gradle Test Libraries', testJars
 }
-
-/*
-task intellijModuleSync(dependsOn: intellijSync) << {
-    final def moduleFile = new File('your-module-here.iml') // TODO rename to match your module's name
-    def root = new XmlParser().parse(moduleFile)
-    def newModuleRootManager = root.component.find {it.'@name' == 'NewModuleRootManager'}
-    def orderEntry = newModuleRootManager.orderEntry.find {
-        it.'@type' == 'library' && it.'@name' == GRADLE_TEST_LIBRARIES_ID
-    }
-    if (orderEntry) {
-        newModuleRootManager.remove(orderEntry)
-    }
-    newModuleRootManager.appendNode('orderEntry', [type: 'library', scope: 'TEST', name: GRADLE_TEST_LIBRARIES_ID, level: 'project'])
-
-    def writer = new StringWriter()
-    new XmlNodePrinter(new PrintWriter(writer)).print(root)
-    moduleFile.write writer.toString()
-    println "File '${moduleFile.path}' updated"
-}
-*/
