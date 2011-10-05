@@ -37,6 +37,7 @@
  * Autolinks — a link that has the same content as it's label (and starts with http or https) is simply rendered as is, like `http://www.overzealous.com`
  * [Markdown Extra definition lists][]
  * [Markdown Extra abbreviations][]
+ * [Markdown Extra header IDs][]
  * Fenced code blocks, using either [Markdown Extra's format][Markdown Extra fenced code block] using `~~~`, or [Github's format][Github fenced code block] using ` ``` `
  * Customization of allowed HTML tags - not really recommended.
 
@@ -78,6 +79,7 @@ During testing, **Remark** also depends on some additional libraries, which are 
 [Markdown Extra definition lists]: http://michelf.com/projects/php-markdown/extra/#def-list
 [Markdown Extra fenced code block]: http://michelf.com/projects/php-markdown/extra/#fenced-code-blocks
 [Markdown Extra abbreviations]: http://michelf.com/projects/php-markdown/extra/#abbr
+[Markdown Extra header IDs]: http://michelf.com/projects/php-markdown/extra/#header-id
 [MultiMarkdown]: http://fletcherpenney.net/multimarkdown/
 [MultiMarkdown tables]: http://fletcher.github.com/peg-multimarkdown/#tables
 [Github fenced code block]: http://github.github.com/github-flavored-markdown/
