@@ -17,15 +17,21 @@
 package com.overzealous.remark.util;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 
 /**
+ * A small collection of utilities for manipulating strings.
+ *
  * @author Phil DeJarnett
  */
 public class StringUtils {
 
+	/** Represents left alignment. */
 	public static final int ALIGN_LEFT = -1;
+	/** Represents centered alignment. */
 	public static final int ALIGN_CENTER = 0;
+	/** Represents right alignment. */
 	public static final int ALIGN_RIGHT = 1;
 
 	/**
@@ -164,6 +170,51 @@ public class StringUtils {
 	public static void multiply(Writer output, String s, int count) throws IOException {
 		for(int i=0; i<count; i++) {
 			output.write(s);
+		}
+	}
+
+
+	/**
+	 * Prepends a specific string to the front of each line of an input string.
+	 *
+	 * Lines are marked by a trailing {@code '\n'}, {@code '\r'}, or {@code '\f'} character.
+	 *
+	 * @param s The input string.
+	 * @param prependWith The string to prepend to each line.
+	 * @return The modified string.
+	 */
+	public static String prependEachLine(String s, String prependWith) {
+		StringWriter sw = new StringWriter(s.length()+(prependWith.length()*20));
+		try {
+			prependEachLine(sw, s, prependWith);
+		} catch(IOException ex) {
+			// won't ever happen
+		}
+		return sw.toString();
+	}
+
+
+	/**
+	 * Prepends a specific string to the front of each line of an input string.
+	 *
+	 * Lines are marked by a trailing {@code '\n'}, {@code '\r'}, or {@code '\f'} character.
+	 *
+	 * @param output The writer to recieve the modified string.
+	 * @param s The input string.
+	 * @param prependWith The string to prepend to each line.
+	 * @throws java.io.IOException if an error occurs during the writing to the output.
+	 */
+	public static void prependEachLine(Writer output, String s, String prependWith) throws IOException {
+		if(s.length() == 0) {
+			return;
+		}
+		output.write(prependWith);
+		for(int i=0; i<s.length(); i++) {
+			char c = s.charAt(i);
+			output.write(c);
+			if(c == '\n' || c == '\r' || c == '\f') {
+				output.write(prependWith);
+			}
 		}
 	}
 
