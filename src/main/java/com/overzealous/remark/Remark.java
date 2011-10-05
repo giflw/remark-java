@@ -17,6 +17,7 @@
 package com.overzealous.remark;
 
 /**
+ * This is the starting point to begin remarking HTML to Markdown from the command line.
  * @author Phil DeJarnett
  */
 public class Remark {
