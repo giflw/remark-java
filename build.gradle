@@ -53,6 +53,7 @@ task runRemark(dependsOn: 'classes', type: JavaExec, description: "Runs the comm
 }
 
 task bumpVersion(description: 'Bumps the app Version for release.') << {
+	//noinspection GroovyAssignabilityCheck
 	def components = version.split('\\.').collect { Integer.parseInt(it.replace('-SNAPSHOT', ''))}
 	components[2] += 1
 	def nextIntegrationVersion = components.join('.')+"-SNAPSHOT"
@@ -73,15 +74,16 @@ task intellijSync(description: 'Add gradle dependecies to IntelliJ project libra
 	}
 
     def makeJarList = { path ->
-        path.split(File.pathSeparator).collect {
+		//noinspection GroovyAssignabilityCheck
+		path.split(File.pathSeparator).collect {
             it.replaceAll userHomeGradle.path, "\\\$USER_HOME_GRADLE\\\$"
         }
     }
     final def compileJars = makeJarList(configurations.compile.asPath)
     final def testJars = makeJarList(configurations.testCompile.asPath) - compileJars
 
-    def createLibrary = { fileName, libraryName, jars ->
-        final def gradleLibXml = new File(librariesDir, fileName)
+    def createLibrary = { String fileName, String libraryName, jars ->
+		final def gradleLibXml = new File(librariesDir, fileName)
         gradleLibXml.write """
 <component name="libraryTable">
 <library name="$libraryName"/>
