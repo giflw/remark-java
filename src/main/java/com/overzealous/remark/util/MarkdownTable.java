@@ -25,10 +25,16 @@ import static com.overzealous.remark.util.MarkdownTable.Alignment.LEFT;
 import static com.overzealous.remark.util.MarkdownTable.Alignment.RIGHT;
 
 /**
+ * Provides a class to contain the structure of an HTML table so it can be cleanly formatted
+ * as a plain text structure (either as Markdown or within a Markdown code block).
+ *
  * @author Phil DeJarnett
  */
 public class MarkdownTable {
 
+	/**
+	 * Simple enum to manage the alignment of a column.
+	 */
 	public enum Alignment {
 		LEFT(-1), CENTER(0), RIGHT(1);
 
@@ -107,7 +113,7 @@ public class MarkdownTable {
 		widths = new int[cols];
 		alignments = new Alignment[cols];
 		for(int i = 0; i<cols; i++) {
-			// configure default alignment
+			// setOptions default alignment
 			alignments[i] = LEFT;
 		}
 
@@ -163,8 +169,6 @@ public class MarkdownTable {
 
 					// Only bother if this is wider than other rows combined
 					if(cellWidth > totalWidth) {
-						System.out.println("---");
-						System.out.printf("%d  %d\n", cellWidth, totalWidth);
 						// add some to each of the columns
 						int diff = cellWidth - totalWidth;
 						// this distributes the extra width needed over the columns as evenly as we can

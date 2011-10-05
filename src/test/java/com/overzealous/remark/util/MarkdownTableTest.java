@@ -16,7 +16,8 @@
 
 package com.overzealous.remark.util;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.StringWriter;
 import java.util.List;
@@ -24,8 +25,9 @@ import java.util.List;
 /**
  * @author Phil DeJarnett
  */
-public class MarkdownTableTest extends TestCase {
+public class MarkdownTableTest {
 
+	@Test
 	public void testTable() throws Exception {
 		MarkdownTable mt = new MarkdownTable();
 		List<MarkdownTableCell> header = mt.addHeaderRow();
@@ -35,9 +37,10 @@ public class MarkdownTableTest extends TestCase {
 			body.add(new MarkdownTableCell("column "+i));
 		}
 
-		assertEquals(TestUtils.readResourceToString("/util/MarkdownTableTest.md"), getTableString(mt, false, false));
+		Assert.assertEquals(TestUtils.readResourceToString("/util/MarkdownTableTest.md"), getTableString(mt, false, false));
 	}
 
+	@Test
 	public void testTableWithAlignment() throws Exception {
 		MarkdownTable mt = new MarkdownTable();
 		List<MarkdownTableCell> header = mt.addHeaderRow();
@@ -49,9 +52,10 @@ public class MarkdownTableTest extends TestCase {
 			body2.add(new MarkdownTableCell("column "+i));
 		}
 
-		assertEquals(TestUtils.readResourceToString("/util/MarkdownTableAlignmentTest.md"), getTableString(mt, false, false));
+		Assert.assertEquals(TestUtils.readResourceToString("/util/MarkdownTableAlignmentTest.md"), getTableString(mt, false, false));
 	}
 
+	@Test
 	public void testTableWithColspan() throws Exception {
 		MarkdownTable mt = new MarkdownTable();
 		List<MarkdownTableCell> header = mt.addHeaderRow();
@@ -64,9 +68,10 @@ public class MarkdownTableTest extends TestCase {
 		body2.add(new MarkdownTableCell("column 1"));
 		body2.add(new MarkdownTableCell("column 2", 2));
 
-		assertEquals(TestUtils.readResourceToString("/util/MarkdownTableColspanTest.md"), getTableString(mt, true, false));
+		Assert.assertEquals(TestUtils.readResourceToString("/util/MarkdownTableColspanTest.md"), getTableString(mt, true, false));
 	}
 
+	@Test
 	public void testTableWithWideColspan() throws Exception {
 		MarkdownTable mt = new MarkdownTable();
 		List<MarkdownTableCell> header = mt.addHeaderRow();
@@ -79,9 +84,10 @@ public class MarkdownTableTest extends TestCase {
 		body2.add(new MarkdownTableCell("column 1"));
 		body2.add(new MarkdownTableCell("this is a really, really, really, really wide colspan", 3));
 
-		assertEquals(TestUtils.readResourceToString("/util/MarkdownTableWideColspanTest.md"), getTableString(mt, true, false));
+		Assert.assertEquals(TestUtils.readResourceToString("/util/MarkdownTableWideColspanTest.md"), getTableString(mt, true, false));
 	}
 
+	@Test
 	public void testTableAsCode() throws Exception {
 		MarkdownTable mt = new MarkdownTable();
 		List<MarkdownTableCell> header = mt.addHeaderRow();
@@ -91,7 +97,7 @@ public class MarkdownTableTest extends TestCase {
 			body.add(new MarkdownTableCell("column "+i));
 		}
 
-		assertEquals(TestUtils.readResourceToString("/util/MarkdownTableAsCodeTest.md"), getTableString(mt, false, true));
+		Assert.assertEquals(TestUtils.readResourceToString("/util/MarkdownTableAsCodeTest.md"), getTableString(mt, false, true));
 	}
 
 	private String getTableString(MarkdownTable mt, boolean allowColSpan, boolean renderAsCode) throws Exception {
@@ -100,6 +106,7 @@ public class MarkdownTableTest extends TestCase {
 		return "\n"+sw.toString();
 	}
 
+	@Test
 	public void testGetNumberOfColumns() throws Exception {
 		MarkdownTable mt = new MarkdownTable();
 		for(int i=0; i<10; i++) {
@@ -109,9 +116,10 @@ public class MarkdownTableTest extends TestCase {
 			}
 		}
 
-		assertEquals(5, mt.getNumberOfColumns());
+		Assert.assertEquals(5, mt.getNumberOfColumns());
 	}
 
+	@Test
 	public void testGetNumberOfColumnsWithUnevenColumns() throws Exception {
 		MarkdownTable mt = new MarkdownTable();
 		for(int i=0; i<3; i++) {
@@ -126,13 +134,13 @@ public class MarkdownTableTest extends TestCase {
 			}
 		}
 
-		assertEquals(5, mt.getNumberOfColumns());
+		Assert.assertEquals(5, mt.getNumberOfColumns());
 
 		List<MarkdownTableCell> row = mt.addHeaderRow();
 		for(int i=1; i<=7; i++) {
 			row.add(new MarkdownTableCell("head "+i));
 		}
 
-		assertEquals(7, mt.getNumberOfColumns());
+		Assert.assertEquals(7, mt.getNumberOfColumns());
 	}
 }
