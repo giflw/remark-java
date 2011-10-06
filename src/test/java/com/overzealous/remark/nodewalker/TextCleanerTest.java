@@ -94,7 +94,29 @@ public class TextCleanerTest {
 	}
 
 	@Test
-	public void testCleanInlineCodeLotsOfTicksTick() throws Exception {
+	public void testCleanInlineCodeLotsOfTicks() throws Exception {
 		Assert.assertEquals("```` ``t```i`ck` ````", BASIC.cleanInlineCode("``t```i`ck`"));
+	}
+
+	@Test
+	public void testReplacementPerformance() throws Exception {
+		String basic = loadBasicIn();
+		String full = loadFullIn();
+		int numberOfTrials = 500;
+		int numberOfTests = 4; // based on tests inside loop below
+		long start = System.currentTimeMillis();
+		for(int i=0; i<numberOfTrials; i++) {
+			BASIC.clean(basic);
+			FULL.clean(full);
+			BASIC.cleanCode(basic);
+			FULL.cleanCode(full);
+		}
+		long end = System.currentTimeMillis();
+
+		// no more than an average of 1ms per test.
+		int expectedTime = numberOfTrials * numberOfTests;
+
+		// ensure that it doesn't take more than 1ms per test.
+		Assert.assertTrue("ReplacementPerformance is too slow.", expectedTime > (end-start));
 	}
 }

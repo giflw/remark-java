@@ -50,8 +50,10 @@ public class TextCleaner {
 
 	/** Used to track the replacements based on matched groups. */
 	private Map<String, String> replacements;
-	/** Compiled replacement pattern. */
-	private Pattern replacementsPattern;
+	/** Compiled entity replacement pattern. */
+	private Pattern entityReplacementsPattern;
+	/** Compiled unicode replacement pattern. */
+	private Pattern unicodeReplacementsPattern = null;
 	/** List of possible escapes */
 	private List<Escape> escapes;
 
@@ -73,57 +75,69 @@ public class TextCleaner {
 	private void setupReplacements(Options options) {
 		this.replacements = new HashMap<String, String> ();
 
-		// Note: the ampersand is special, and must be replaced with care!!
-		addRepl("&amp;", "&");
-		addRepl("&lt;", "<");
-		addRepl("&gt;", ">");
-		addRepl("&quot;", "\"");
+		// build replacement regex
+		StringBuilder entities = new StringBuilder(replacements.size()*5);
+
+		// this is a special case for double-encoded HTML entities.
+		entities.append("&(?>amp;([#a-z0-9]++;)|(?>");
+		addRepl(entities, "&amp;", "&");
+		addRepl(entities, "&lt;", "<");
+		addRepl(entities, "&gt;", ">");
+		addRepl(entities, "&quot;", "\"");
 		if(options.reverseHtmlSmartQuotes) {
-			addRepl("&ldquo;", "\"");
-			addRepl("&rdquo;", "\"");
-			addRepl("&lsquo;", "\'");
-			addRepl("&rsquo;", "\'");
-			addRepl("&apos;", "\'");
-			addRepl("&laquo;", "<<");
-			addRepl("&raquo;", ">>");
-		}
-		if(options.reverseUnicodeSmartQuotes) {
-			addRepl("\u201c", "\""); // left double quote: “
-			addRepl("\u201d", "\""); // right double quote: ”
-			addRepl("\u2018", "\'"); // left single quote: ‘
-			addRepl("\u2019", "\'"); // right single quote: ’
-			addRepl("\u00ab", "<<"); // left angle quote: «
-			addRepl("\u00bb", ">>"); // right angle quote: »
+			addRepl(entities, "&ldquo;", "\"");
+			addRepl(entities, "&rdquo;", "\"");
+			addRepl(entities, "&lsquo;", "\'");
+			addRepl(entities, "&rsquo;", "\'");
+			addRepl(entities, "&apos;", "\'");
+			addRepl(entities, "&laquo;", "<<");
+			addRepl(entities, "&raquo;", ">>");
 		}
 		if(options.reverseHtmlSmartPunctuation) {
-			addRepl("&ndash;", "--");
-			addRepl("&mdash;", "---");
-			addRepl("&hellip;", "...");
+			addRepl(entities, "&ndash;", "--");
+			addRepl(entities, "&mdash;", "---");
+			addRepl(entities, "&hellip;", "...");
 		}
-		if(options.reverseUnicodeSmartPunctuation) {
-			addRepl("\u2013", "--"); // en-dash: –
-			addRepl("\u2014", "---"); // em-dash: —
-			addRepl("\u2026", "..."); // ellipsis: …
+		entities.replace(entities.length()-1, entities.length(), ");)");
+
+		entityReplacementsPattern = Pattern.compile(entities.toString(), Pattern.CASE_INSENSITIVE);
+
+		if(options.reverseUnicodeSmartPunctuation || options.reverseUnicodeSmartQuotes) {
+			StringBuilder unicode = new StringBuilder("[\\Q");
+			if(options.reverseUnicodeSmartQuotes) {
+				addRepl(unicode, "\u201c", "\""); // left double quote: “
+				addRepl(unicode, "\u201d", "\""); // right double quote: ”
+				addRepl(unicode, "\u2018", "\'"); // left single quote: ‘
+				addRepl(unicode, "\u2019", "\'"); // right single quote: ’
+				addRepl(unicode, "\u00ab", "<<"); // left angle quote: «
+				addRepl(unicode, "\u00bb", ">>"); // right angle quote: »
+			}
+			if(options.reverseUnicodeSmartPunctuation) {
+				addRepl(unicode, "\u2013", "--"); // en-dash: –
+				addRepl(unicode, "\u2014", "---"); // em-dash: —
+				addRepl(unicode, "\u2026", "..."); // ellipsis: …
+			}
+			unicode.append("\\E]");
+			unicodeReplacementsPattern = Pattern.compile(unicode.toString());
 		}
-		// build replacement regex
-		StringBuilder sb = new StringBuilder(replacements.size()*5);
-		// this is a special case for double-encoded HTML entities.
-		sb.append("&amp;([#a-z0-9]+;)");
-		for(Map.Entry<String, String> rep : replacements.entrySet()) {
-			sb.append('|');
-			sb.append(Pattern.quote(rep.getKey()));
-		}
-		
-		replacementsPattern = Pattern.compile(sb.toString(), Pattern.CASE_INSENSITIVE);
 	}
 
 	/**
 	 * Utility method to make the code above easier to read.
+	 * @param regex A character buffer to append the replacement to
 	 * @param original Original character or string.
 	 * @param replacement Replacement character or string.
 	 */
-	private void addRepl(String original, String replacement) {
+	private void addRepl(StringBuilder regex, String original, String replacement) {
 		replacements.put(original, replacement);
+		if(original.charAt(0) == '&') {
+			// add entity
+			regex.append(original.substring(1, original.length() - 1));
+			regex.append('|');
+		} else {
+			// add single character
+			regex.append(original);
+		}
 	}
 
 	/**
@@ -147,7 +161,7 @@ public class TextCleaner {
 		escapes.add(new Escape(chars.toString(), "\\\\$1"));
 
 		// finally, escape certain characters only if they are leading characters
-		StringBuilder leadingChars = new StringBuilder("^( ?)([\\Q-+");
+		StringBuilder leadingChars = new StringBuilder("^( ?+)([\\Q-+");
 		if(options.definitionLists) {
 			leadingChars.append(':');
 		}
@@ -196,21 +210,10 @@ public class TextCleaner {
 			for(Escape rep : escapes) {
 				input = rep.pattern.matcher(input).replaceAll(rep.replacement);
 			}
-			StringBuffer output = new StringBuffer();
-			// if we aren't escaping, don't bother replacing smart quotes, either.
-			Matcher m = replacementsPattern.matcher(input);
-			while (m.find()) {
-				String repString;
-				if(replacements.containsKey(m.group().toLowerCase())) {
-					repString = replacements.get(m.group().toLowerCase());
-				} else {
-					// special case for ampersands
-					repString = "\\\\&$1";
-				}
-				m.appendReplacement(output, repString);
+			StringBuffer output = doReplacements(input, entityReplacementsPattern);
+			if(unicodeReplacementsPattern != null) {
+				output = doReplacements(output, unicodeReplacementsPattern);
 			}
-			m.appendTail(output);
-
 			return output.toString();
 		} else {
 			// we have to revert ALL HTML entities for code, because they will end up
@@ -219,6 +222,32 @@ public class TextCleaner {
 			// note: we have to manually replace &apos; because it is ignored by StringEscapeUtils for some reason.
 			return StringEscapeUtils.unescapeHtml4(input.replace("&apos;", "'"));
 		}
+	}
+
+	/**
+	 * Handles running the regex-based replacements in the input
+	 * @param input String to process
+	 * @param regex Pattern to use
+	 * @return cleaned up input string
+	 */
+	private StringBuffer doReplacements(CharSequence input, Pattern regex) {
+		StringBuffer output = new StringBuffer();
+
+		Matcher m = regex.matcher(input);
+		while (m.find()) {
+			String repString;
+			// if we have a hard match, do a simple replacement.
+			if(replacements.containsKey(m.group().toLowerCase())) {
+				repString = replacements.get(m.group().toLowerCase());
+			} else {
+				// special case for escaped HTML entities.
+				repString = "\\\\&$1";
+			}
+			m.appendReplacement(output, repString);
+		}
+		m.appendTail(output);
+
+		return output;
 	}
 
 	/**
