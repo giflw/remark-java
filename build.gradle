@@ -18,8 +18,21 @@ repositories {
 
 dependencies {
     compile group: 'org.jsoup', name: 'jsoup', version: '1.6.+'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.+'
     testCompile group: 'junit', name: 'junit', version: '4.+'
 	testCompile group: 'commons-io', name: 'commons-io', version: '1.3.2'
+
+	// Add source and javadoc artifacts
+	configurations.compile.dependencies.each { dep ->
+		['jar':null,'source':'sources','javadoc':'javadoc'].each{arType, arClassifier ->
+			dep.artifact {
+				name = dep.name
+				extension = 'jar'
+				type = arType
+				classifier = arClassifier
+			}
+		}
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -90,9 +103,20 @@ task intellijSync(description: 'Add gradle dependecies to IntelliJ project libra
 </component>"""
         final def xmlRoot = new XmlParser().parse(gradleLibXml)
         final def classesNode = xmlRoot.library[0].appendNode('CLASSES')
+		final def sourcesNode = xmlRoot.library[0].appendNode('SOURCES')
+		final def javadocNode = xmlRoot.library[0].appendNode('JAVADOC')
 
         jars.each { jar ->
-            classesNode.appendNode('root', [url: "jar://$jar!/"])
+			if(jar ==~ /.*-sources\.jar$/) {
+				//println "adding source jar $jar"
+				sourcesNode.appendNode('root', [url: "jar://$jar!/"])
+			} else if(jar ==~ /.*-javadoc\.jar$/) {
+				//println "adding javadoc jar $jar"
+				javadocNode.appendNode('root', [url: "jar://$jar!/"])
+			} else {
+				//println "adding classes jar $jar"
+            	classesNode.appendNode('root', [url: "jar://$jar!/"])
+			}
         }
 
         def writer = new StringWriter()
