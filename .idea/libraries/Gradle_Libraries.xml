@@ -2,8 +2,15 @@
   <library name="Gradle Libraries">
     <CLASSES>
       <root url="jar://$USER_HOME_GRADLE$/cache/org.jsoup/jsoup/jars/jsoup-1.6.1.jar!/" />
+      <root url="jar://$USER_HOME_GRADLE$/cache/org.apache.commons/commons-lang3/jars/commons-lang3-3.0.1.jar!/" />
     </CLASSES>
-    <JAVADOC />
-    <SOURCES />
+    <JAVADOC>
+      <root url="jar://$USER_HOME_GRADLE$/cache/org.jsoup/jsoup/javadocs/jsoup-1.6.1-javadoc.jar!/" />
+      <root url="jar://$USER_HOME_GRADLE$/cache/org.apache.commons/commons-lang3/javadocs/commons-lang3-3.0.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME_GRADLE$/cache/org.jsoup/jsoup/sources/jsoup-1.6.1-sources.jar!/" />
+      <root url="jar://$USER_HOME_GRADLE$/cache/org.apache.commons/commons-lang3/sources/commons-lang3-3.0.1-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>
