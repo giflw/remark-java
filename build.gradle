@@ -21,18 +21,6 @@ dependencies {
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.+'
     testCompile group: 'junit', name: 'junit', version: '4.+'
 	testCompile group: 'commons-io', name: 'commons-io', version: '1.3.2'
-
-	// Add source and javadoc artifacts
-	configurations.compile.dependencies.each { dep ->
-		['jar':null,'source':'sources','javadoc':'javadoc'].each{arType, arClassifier ->
-			dep.artifact {
-				name = dep.name
-				extension = 'jar'
-				type = arType
-				classifier = arClassifier
-			}
-		}
-	}
 }
 
 //---------------------------------------------------------------------------
@@ -75,8 +63,21 @@ task bumpVersion(description: 'Bumps the app Version for release.') << {
 	file("gradle.properties").text = newProps
 }
 
-
 task intellijSync(description: 'Add gradle dependecies to IntelliJ project library') << {
+
+	// Add source and javadoc artifacts
+	configurations.each{
+		it.dependencies.each { dep ->
+			['jar':null,'source':'sources','javadoc':'javadoc'].each{arType, arClassifier ->
+				dep.artifact {
+					name = dep.name
+					extension = 'jar'
+					type = arType
+					classifier = arClassifier
+				}
+			}
+		}
+	}
 
     final def librariesDir = new File(".idea${File.separator}libraries")
     librariesDir.mkdirs()
@@ -106,17 +107,23 @@ task intellijSync(description: 'Add gradle dependecies to IntelliJ project libra
 		final def sourcesNode = xmlRoot.library[0].appendNode('SOURCES')
 		final def javadocNode = xmlRoot.library[0].appendNode('JAVADOC')
 
+        println "Creating $libraryName";
+
         jars.each { jar ->
+			def type;
 			if(jar ==~ /.*-sources\.jar$/) {
-				//println "adding source jar $jar"
+				type = 'sources';
 				sourcesNode.appendNode('root', [url: "jar://$jar!/"])
 			} else if(jar ==~ /.*-javadoc\.jar$/) {
-				//println "adding javadoc jar $jar"
+				type = 'javadoc';
 				javadocNode.appendNode('root', [url: "jar://$jar!/"])
 			} else {
-				//println "adding classes jar $jar"
+				type = 'class';
             	classesNode.appendNode('root', [url: "jar://$jar!/"])
 			}
+			def jarShortName = jar.replace('$USER_HOME_GRADLE$/cache/', '')
+			println " - Added $type jar $jarShortName"
+
         }
 
         def writer = new StringWriter()
