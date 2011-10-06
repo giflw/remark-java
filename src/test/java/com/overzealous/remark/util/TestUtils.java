@@ -18,7 +18,8 @@ package com.overzealous.remark.util;
 
 import org.apache.commons.io.FileUtils;
 
-import java.io.IOException;
+import java.io.File;
+import java.net.URL;
 
 /**
  * @author Phil DeJarnett
@@ -31,11 +32,23 @@ public class TestUtils {
 	 * @return String contents of resource
 	 */
 	public static String readResourceToString(String path) {
-		String result = "";
+		String result;
 		try {
-			result =  FileUtils.readFileToString(FileUtils.toFile(StringUtils.class.getResource(path)));
-		} catch(IOException e) {
+			URL u = StringUtils.class.getResource(path);
+			if(u == null) {
+				throw new Exception("Resource not found");
+			}
+			File f = FileUtils.toFile(u);
+			if(!f.isFile()) {
+				throw new Exception("Resource file does not exist or is not a file.");
+			}
+			result = FileUtils.readFileToString(f, "UTF-8");
+			if(result == null) {
+				throw new Exception("Error reading resource file.");
+			}
+		} catch(Exception e) {
 			e.printStackTrace();
+			result = "UNABLE TO LOAD RESOURCE "+path+": "+e.getMessage();
 		}
 		return result;
 	}
