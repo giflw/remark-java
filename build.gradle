@@ -46,11 +46,17 @@ javadoc {
 // Custom tasks
 //---------------------------------------------------------------------------
 
-task runRemark(dependsOn: 'classes', type: JavaExec, description: "Runs the command-line Remark class") << {
-    main = 'com.overzealous.remark.Remark'
-    classpath = sourceSets.main.runtimeClasspath
-    //args ''
-    //systemProperty 'simple.message', 'Hello '
+task runRemark(dependsOn: 'classes', description: "Runs the command-line Remark class") << {
+	def exit = javaexec{
+		main = 'com.overzealous.remark.Remark'
+		classpath = sourceSets.main.runtimeClasspath
+		//args ''
+		//systemProperty 'simple.message', 'Hello '
+	}
+	if(exit.exitValue != 0) {
+		//println exit
+		println "exit value: ${exit.exitValue}"
+	}
 }
 
 task bumpVersion(description: 'Bumps the app Version for release.') << {
