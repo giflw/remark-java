@@ -16,10 +16,8 @@
 
 package com.overzealous.remark.util;
 
-import java.io.BufferedWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This is a customized subclass of BufferedWriter that handles working with Markdown block-level elements.
@@ -27,7 +25,7 @@ import java.io.Writer;
  *
  * @author Phil DeJarnett
  */
-public class BlockWriter extends PrintWriter {
+public final class BlockWriter extends PrintWriter {
 
 	private int blockDepth = 0;
 
@@ -35,7 +33,13 @@ public class BlockWriter extends PrintWriter {
 
 	private boolean empty = true;
 
-	private StringWriter sw = null;
+	private StringWriter buffer = null;
+
+	private String prependNewLineString = null;
+
+	private boolean prependShouldAddBeforeNextWrite = true;
+
+	private final ReentrantLock prependingLock = new ReentrantLock();
 
 	/**
 	 * Creates a new, empty BlockWriter with a StringWriter as the buffer.
@@ -45,37 +49,133 @@ public class BlockWriter extends PrintWriter {
 	 * @return new BlockWriter
 	 */
 	public static BlockWriter create() {
-		StringWriter sw = new StringWriter();
-		BlockWriter bw = new BlockWriter(new BufferedWriter(sw));
-		bw.sw = sw;
+		StringWriter buffer = new StringWriter();
+		@SuppressWarnings({"IOResourceOpenedButNotSafelyClosed"})
+		BlockWriter bw = new BlockWriter(new BufferedWriter(buffer));
+		bw.buffer = buffer;
 		return bw;
 	}
 
-	/**
-	 * Creates a new BlockWriter with an arbitrary output stream.
-	 * @param out The output stream that is buffered and written to.
-	 */
 	public BlockWriter(Writer out) {
 		super(out);
 	}
 
-    @Override
+	public BlockWriter(Writer out, boolean autoFlush) {
+		super(out, autoFlush);
+	}
+
+	public BlockWriter(OutputStream out) {
+		super(out);
+	}
+
+	public BlockWriter(OutputStream out, boolean autoFlush) {
+		super(out, autoFlush);
+	}
+
+	@Override
 	public void write(int c) {
 		testNewBlock();
 		super.write(c);
+		if(c == '\n') {
+			prependAfterNewline();
+		}
     }
 
     @Override
 	public void write(char cbuf[], int off, int len) {
+		if(len == 0) {
+			return;
+		}
 		testNewBlock();
-		super.write(cbuf, off, len);
+		if(prependNewLineString != null && !prependingLock.isLocked()) {
+			writePrepended(cbuf, off, len);
+		} else {
+			super.write(cbuf, off, len);
+		}
     }
+
+	// writes a character buffer while prepending lines
+	private void writePrepended(char cbuf[], int off, int len) {
+		prependingLock.lock();
+		try {
+			// keep track of what needs to be added
+			int start = off;
+			// loop over the cbuf and see if it contains any newlines.
+			for(int i=off; i<off+len; i++) {
+				if(cbuf[i] == '\n') {
+					i++;
+					// if this is a newline, then write what we have, and handle the prepend
+					write(cbuf, start, i-start);
+					writePrepend();
+					// start the next round at the newline
+					start = i;
+				}
+			}
+			// write tail
+			if(start < off+len) {
+				write(cbuf, start, (off+len)-start);
+			}
+		} finally {
+			prependingLock.unlock();
+		}
+	}
 
     @Override
 	public void write(String s, int off, int len) {
+		if(len == 0) {
+			return;
+		}
 		testNewBlock();
-		super.write(s, off, len);
+		if((prependNewLineString != null) && (s.indexOf('\n') != -1) && !prependingLock.isLocked()) {
+			writePrepended(s, off, len);
+		} else {
+			super.write(s, off, len);
+		}
     }
+
+	// writes a string while prepending lines
+	private void writePrepended(String s, int off, int len) {
+		prependingLock.lock();
+		try {
+			// keep track of what needs to be added
+			int start = off;
+			// loop over the string and see if it contains any newlines.
+			for(int i=off; i<off+len; i++) {
+				if(s.charAt(i) == '\n') {
+					i++;
+					// if this is a newline, then write what we have, and handle the prepend
+					write(s, start, i-start);
+					writePrepend();
+					// start the next round at the newline
+					start = i;
+				}
+			}
+			// write tail
+			if(start < off+len) {
+				write(s, start, (off+len)-start);
+			}
+		} finally {
+			prependingLock.unlock();
+		}
+	}
+
+	@Override
+	public void println() {
+		testFirstPrepend();
+		super.println();
+		prependAfterNewline();
+	}
+
+	private void prependAfterNewline() {
+		if(prependNewLineString != null && !prependingLock.isLocked()) {
+			prependingLock.lock();
+			try {
+				writePrepend();
+			} finally {
+				prependingLock.unlock();
+			}
+		}
+	}
 
 	/**
 	 * Tests to see if we need to forcibly start a new block.
@@ -88,13 +188,40 @@ public class BlockWriter extends PrintWriter {
 	 * Note: this only occurs at the top level.  Otherwise, once inside a block, it is rendered as
 	 * part of whatever block is currently being rendered.
 	 *
+	 * (This method also handles adding the initial prepended string if necessary.)
+	 *
 	 */
 	private void testNewBlock(){
+		testFirstPrepend();
 		if(blockDepth == 0) {
 			startBlock();
 			// keep track of automatically started blocks.  See startBlock below.
 			autoStartedBlock = true;
 		}
+	}
+
+	/**
+	 * Test to see if we should add a prepend because this is the first line.
+	 */
+	private void testFirstPrepend() {
+		if(prependShouldAddBeforeNextWrite && prependNewLineString != null && !prependingLock.isLocked()) {
+			prependingLock.lock();
+			try {
+				writePrepend();
+			} finally {
+				prependingLock.unlock();
+			}
+			// set to true to prevent any more checking for prepending
+			prependShouldAddBeforeNextWrite = false;
+		}
+	}
+
+	/**
+	 * Writes the prepend string to the output writer.
+	 * This method keeps track of the current status to prevent recursion.
+	 */
+	private void writePrepend() {
+		super.write(prependNewLineString, 0, prependNewLineString.length());
 	}
 
 	/**
@@ -175,7 +302,44 @@ public class BlockWriter extends PrintWriter {
 	 * @return the buffer for this BlockWriter
 	 */
 	public StringWriter getBuffer() {
-		return sw;
+		return buffer;
+	}
+
+	/**
+	 * Returns the string being prepended to new lines, if set.
+	 * @return String that gets prepended before each new line, or null if not set.
+	 */
+	public String getPrependNewlineString() {
+		return prependNewLineString;
+	}
+
+	/**
+	 * Sets the string to prepend to new lines.  If set to null, this feature is disabled.
+	 * By default, this starts adding the prepend immediately.
+	 *
+	 * @param prependNewLineString The string to prepend to each new line.
+	 * @return This for chaining (especially after creation)
+	 */
+	public BlockWriter setPrependNewlineString(String prependNewLineString) {
+		this.prependNewLineString = prependNewLineString;
+		prependShouldAddBeforeNextWrite = true;
+		return this;
+	}
+
+	/**
+	 * Sets the string to prepend to new lines.  If set to null, this feature is disabled.
+	 * The second parameter affects whether or not the next encountered new line gets the
+	 * prepend string.  If it is true, the first line won't be affected.  Otherwise,
+	 * this is the same as {@link #setPrependNewlineString(String)}.
+	 *
+	 * @param prependNewLineString The string to prepend to each new line.
+	 * @param skipFirstLine If true, the first line won't be prepended.
+	 * @return This for chaining (especially after creation)
+	 */
+	public BlockWriter setPrependNewlineString(String prependNewLineString, boolean skipFirstLine) {
+		this.prependNewLineString = prependNewLineString;
+		prependShouldAddBeforeNextWrite = !skipFirstLine;
+		return this;
 	}
 
 	/**
@@ -187,12 +351,11 @@ public class BlockWriter extends PrintWriter {
 	 * @return The contents of the buffer, or a generic Object method.
 	 */
 	public String toString() {
-		if(this.sw != null) {
+		if(this.buffer != null) {
 			this.flush();
-			return sw.toString();
+			return buffer.toString();
 		} else {
 			return super.toString();
 		}
 	}
-
 }

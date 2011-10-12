@@ -93,4 +93,52 @@ public class BlockWriterTest {
 
 		Assert.assertEquals("hello42\n\nblock1", bw.toString());
 	}
+
+	@Test
+	public void testPrependChar() throws Exception {
+		BlockWriter bw = BlockWriter.create();
+		bw.setPrependNewlineString("XXXX");
+		bw.write('a');
+
+		Assert.assertEquals("XXXXa", bw.toString());
+	}
+
+	@Test
+	public void testPrependCharBuffer() throws Exception {
+		BlockWriter bw = BlockWriter.create();
+		bw.setPrependNewlineString("XXXX");
+		bw.write("abc\ndef\nghi".toCharArray());
+
+		Assert.assertEquals("XXXXabc\nXXXXdef\nXXXXghi", bw.toString());
+	}
+
+	@Test
+	public void testPrependString() throws Exception {
+		BlockWriter bw = BlockWriter.create();
+		bw.setPrependNewlineString("XXXX");
+		bw.write("abc\ndef\nghi");
+		bw.write("\njkl");
+
+		Assert.assertEquals("XXXXabc\nXXXXdef\nXXXXghi\nXXXXjkl", bw.toString());
+	}
+
+	@Test
+	public void testPrependNotFirst() throws Exception {
+		BlockWriter bw = BlockWriter.create();
+		bw.setPrependNewlineString("XXXX", true);
+		bw.write("- ");
+		bw.write("abc\ndef\nghi");
+
+		Assert.assertEquals("- abc\nXXXXdef\nXXXXghi", bw.toString());
+	}
+
+	@Test
+	public void testPrependBlocks() throws Exception {
+		BlockWriter bw = BlockWriter.create();
+		bw.setPrependNewlineString("XXXX");
+		bw.printBlock("abc\ndef");
+		bw.printBlock("ghi\njkl");
+
+		Assert.assertEquals("XXXXabc\nXXXXdef\nXXXX\nXXXXghi\nXXXXjkl", bw.toString());
+	}
 }
