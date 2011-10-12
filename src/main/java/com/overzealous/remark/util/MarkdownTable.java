@@ -137,10 +137,11 @@ public class MarkdownTable {
 	 * @param rows The rows that should be processed.
 	 * @param allowColspan If true, allow cells to span multiple columns.
 	 */
+	@SuppressWarnings({"OverlyNestedMethod"})
 	private void calculateColumnMetrics(List<List<MarkdownTableCell>> rows, boolean allowColspan) {
 		for(List<MarkdownTableCell> row : rows) {
 			int col = 0;
-			for(MarkdownTableCell cell : row) {
+			for(final MarkdownTableCell cell : row) {
 
 				if(cell.getAlignment() != LEFT) {
 					// if a non-standard alignment, set the column alignment
@@ -210,7 +211,7 @@ public class MarkdownTable {
 			}
 			output.write('|');
 			int col = 0;
-			for(MarkdownTableCell cell : row) {
+			for(final MarkdownTableCell cell : row) {
 				Alignment alignment = alignments[col];
 				if( !allowColspan || cell.getColspan() == 1) {
 					// write the cell
@@ -304,7 +305,7 @@ public class MarkdownTable {
 
 	private int getNumberOfColumnsInRow(List<MarkdownTableCell> row) {
 		int count = 0;
-		for(MarkdownTableCell cell : row) {
+		for(final MarkdownTableCell cell : row) {
 			count += cell.getColspan();
 		}
 		return count;

@@ -20,10 +20,7 @@ import com.overzealous.remark.Options;
 import com.overzealous.remark.util.StringUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,6 +69,7 @@ public class TextCleaner {
 	 * Configures the basic replacements based on the configured options.
 	 * @param options Options that will affect what is replaced.
 	 */
+	@SuppressWarnings({"OverlyLongMethod"})
 	private void setupReplacements(Options options) {
 		this.replacements = new HashMap<String, String> ();
 
@@ -207,7 +205,7 @@ public class TextCleaner {
 			input = LINEBREAK_REMOVER.matcher(input).replaceAll(" ");
 
 			// now escape special characters.
-			for(Escape rep : escapes) {
+			for(final Escape rep : escapes) {
 				input = rep.pattern.matcher(input).replaceAll(rep.replacement);
 			}
 			StringBuffer output = doReplacements(input, entityReplacementsPattern);
@@ -237,8 +235,9 @@ public class TextCleaner {
 		while (m.find()) {
 			String repString;
 			// if we have a hard match, do a simple replacement.
-			if(replacements.containsKey(m.group().toLowerCase())) {
-				repString = replacements.get(m.group().toLowerCase());
+			String replacementKey = m.group().toLowerCase(Locale.ENGLISH);
+			if(replacements.containsKey(replacementKey)) {
+				repString = replacements.get(replacementKey);
 			} else {
 				// special case for escaped HTML entities.
 				repString = "\\\\&$1";

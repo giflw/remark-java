@@ -32,24 +32,11 @@ public class IgnoredHtmlElement {
 	/**
 	 * Create a new IgnoredHtmlElement.  The tagname may also be referred to as the NodeName.
 	 *
-	 * @param tagName The tag name, such as <code>DIV</code>, case-insensitive.
+	 * @param tagName The tag name, such as {@code DIV}, case-insensitive.
 	 */
 	public IgnoredHtmlElement(String tagName) {
 		this.tagName = tagName;
 		this.attributes = new HashSet<String>();
-	}
-
-	/**
-	 * Create a new IgnoredHtmlElement.  The tagname may also be referred to as the NodeName.
-	 *
-	 * @param tagName The tag name, such as <code>DIV</code>, case-insensitive.
-	 * @param attributes Zero or more attributes that should be enabled on this tag.
-	 */
-	public IgnoredHtmlElement(String tagName, String... attributes) {
-		this(tagName);
-		for(String attr : attributes) {
-			this.addAttribute(attr);
-		}
 	}
 
 	/**
@@ -61,7 +48,7 @@ public class IgnoredHtmlElement {
 	 */
 	public static IgnoredHtmlElement create(String tagName, String... attributes) {
 		IgnoredHtmlElement el = new IgnoredHtmlElement(tagName);
-		for(String attr : attributes) {
+		for(final String attr : attributes) {
 			el.addAttribute(attr);
 		}
 		return el;
@@ -97,7 +84,7 @@ public class IgnoredHtmlElement {
 	 * @param attributes The attribute names that are to be allowed.
 	 */
 	public void addAttributes(String... attributes) {
-		for(String attr : attributes) {
+		for(final String attr : attributes) {
 			this.addAttribute(attr);
 		}
 	}
