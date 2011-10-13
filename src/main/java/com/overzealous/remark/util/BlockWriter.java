@@ -49,7 +49,23 @@ public final class BlockWriter extends PrintWriter {
 	 * @return new BlockWriter
 	 */
 	public static BlockWriter create() {
-		StringWriter buffer = new StringWriter();
+		return BlockWriter.create(new StringWriter());
+	}
+
+	/**
+	 * Creates a new, empty BlockWriter with a StringWriter as the buffer.
+	 * To get the contents of the StringWriter, call BlockWriter.toString()
+	 *
+	 * @param initialSize  Initialize the output buffer to the specified size.
+	 * @see #toString()
+	 * @return new BlockWriter
+	 */
+	public static BlockWriter create(int initialSize) {
+		return BlockWriter.create(new StringWriter(initialSize));
+	}
+
+	// handles the actual setting up of the buffer
+	private static BlockWriter create(StringWriter buffer) {
 		@SuppressWarnings({"IOResourceOpenedButNotSafelyClosed"})
 		BlockWriter bw = new BlockWriter(new BufferedWriter(buffer));
 		bw.buffer = buffer;
