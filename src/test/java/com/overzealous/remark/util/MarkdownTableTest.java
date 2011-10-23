@@ -19,6 +19,7 @@ package com.overzealous.remark.util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
@@ -100,10 +101,11 @@ public class MarkdownTableTest {
 		Assert.assertEquals(TestUtils.readResourceToString("/util/MarkdownTableAsCodeTest.md"), getTableString(mt, false, true));
 	}
 
-	private String getTableString(MarkdownTable mt, boolean allowColSpan, boolean renderAsCode) throws Exception {
+	private String getTableString(MarkdownTable mt, boolean allowColSpan, boolean renderAsCode) {
 		StringWriter sw = new StringWriter();
-		mt.renderTable(sw, allowColSpan, renderAsCode);
-		return "\n"+sw.toString();
+		//noinspection IOResourceOpenedButNotSafelyClosed
+		mt.renderTable(new PrintWriter(sw), allowColSpan, renderAsCode);
+		return '\n' + sw.toString();
 	}
 
 	@Test

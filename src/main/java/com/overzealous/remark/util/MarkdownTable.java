@@ -16,8 +16,7 @@
 
 package com.overzealous.remark.util;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class MarkdownTable {
 	public enum Alignment {
 		LEFT(-1), CENTER(0), RIGHT(1);
 
-		private int dir;
+		private final int dir;
 
 		Alignment(int dir) {
 			this.dir = dir;
@@ -59,12 +58,14 @@ public class MarkdownTable {
 		}
 	}
 
-	private List<List<MarkdownTableCell>> header;
-	private List<List<MarkdownTableCell>> body;
+	private final List<List<MarkdownTableCell>> header;
+	private final List<List<MarkdownTableCell>> body;
 
 	private int cols;
 	private int[] widths;
 	private Alignment[] alignments;
+
+	private boolean firstNewline = true;
 
 
 	/**
@@ -106,9 +107,8 @@ public class MarkdownTable {
 	 * @param allowColspan If true, cells that span multiple columns are preserved.  If false, they are rendered in
 	 * 						their own column, then empty columns are placed after.
 	 * @param renderAsCode If true, the output is rendered as a code block
-	 * @throws IOException If an error occurs on the output stream.
 	 */
-	public void renderTable(Writer output, boolean allowColspan, boolean renderAsCode) throws IOException {
+	public void renderTable(PrintWriter output, boolean allowColspan, boolean renderAsCode) {
 		cols = this.getNumberOfColumns();
 		widths = new int[cols];
 		alignments = new Alignment[cols];
@@ -119,6 +119,8 @@ public class MarkdownTable {
 
 		this.calculateColumnMetrics(this.header, allowColspan);
 		this.calculateColumnMetrics(this.body, allowColspan);
+
+		firstNewline = true;
 
 		// now we have our column widths, as well as the alignments
 		this.renderRows(output, this.header, allowColspan, renderAsCode);
@@ -202,10 +204,10 @@ public class MarkdownTable {
 	 * @param rows The rows to render
 	 * @param allowColspan If true, allow cells to span multiple columns
 	 * @param renderAsCode If true, prepends each row with four spaces
-	 * @throws IOException If an error occurs writing to the output stream
 	 */
-	private void renderRows(Writer output, List<List<MarkdownTableCell>> rows, boolean allowColspan, boolean renderAsCode) throws IOException {
+	private void renderRows(PrintWriter output, List<List<MarkdownTableCell>> rows, boolean allowColspan, boolean renderAsCode) {
 		for(List<MarkdownTableCell> row : rows) {
+			println(output);
 			if(renderAsCode) {
 				output.write("    ");
 			}
@@ -245,11 +247,11 @@ public class MarkdownTable {
 				// due to column spanning, we can't rely on the size of the row.
 				col += cell.getColspan();
 			}
-			output.write('\n');
 		}
 	}
 
-	private void renderHeaderSeparator(Writer output, boolean renderAsCode) throws IOException {
+	private void renderHeaderSeparator(PrintWriter output, boolean renderAsCode) {
+		println(output);
 		// check to see if there's any alignment at all.
 		// if not, don't bother rendering the ':'
 		boolean alignmentFound = false;
@@ -284,7 +286,14 @@ public class MarkdownTable {
 			}
 			output.write('|');
 		}
-		output.write('\n');
+	}
+
+	private void println(PrintWriter output) {
+		if(firstNewline) {
+			firstNewline = false;
+		} else {
+			output.println();
+		}
 	}
 
 	/**

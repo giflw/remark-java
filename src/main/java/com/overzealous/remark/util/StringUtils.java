@@ -16,9 +16,8 @@
 
 package com.overzealous.remark.util;
 
-import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 
 /**
  * A small collection of utilities for manipulating strings.
@@ -41,6 +40,7 @@ public class StringUtils {
 	 * @param alignment How to align the string < 0 means left, 0 means center, and > 0 means right
 	 * @return Padded string
 	 */
+	@SuppressWarnings({"SameParameterValue", "SameParameterValue"})
 	public static String align(String s, int width, int alignment) {
 		return align(s, width, ' ', alignment);
 	}
@@ -79,9 +79,8 @@ public class StringUtils {
 	 * @param s String to pad
 	 * @param width Minimum width of final string
 	 * @param alignment How to align the string < 0 means left, 0 means center, and > 0 means right
-	 * @throws java.io.IOException If an error occurs on the Writer
 	 */
-	public static void align(Writer output, String s, int width, int alignment) throws IOException {
+	public static void align(PrintWriter output, String s, int width, int alignment) {
 		align(output, s, width, ' ', alignment);
 	}
 
@@ -92,9 +91,8 @@ public class StringUtils {
 	 * @param width Minimum width of final string
 	 * @param paddingChar Character to pad with
 	 * @param alignment How to align the string < 0 means left, 0 means center, and > 0 means right
-	 * @throws java.io.IOException If an error occurs on the Writer
 	 */
-	public static void align(Writer output, String s, int width, char paddingChar, int alignment) throws IOException {
+	public static void align(PrintWriter output, String s, int width, char paddingChar, int alignment) {
 		if(s.length() < width) {
 			int diff = width - s.length();
 			if(alignment == 0) {
@@ -116,8 +114,8 @@ public class StringUtils {
 	}
 
 	/**
-	 *  Duplicates the given character <code>count</code> times.
-	 *  If <code>count</code> is less than or equal to 0, the empty string is returned.
+	 *  Duplicates the given character {@code count} times.
+	 *  If {@code count} is less than or equal to 0, the empty string is returned.
 	 * @param c Character to duplicate
 	 * @param count Number of times to duplicate
 	 * @return Duplicated string.
@@ -127,8 +125,8 @@ public class StringUtils {
 	}
 
 	/**
-	 *  Duplicates the given string <code>count</code> times.
-	 *  If <code>count</code> is less than or equal to 0, the empty string is returned.
+	 *  Duplicates the given string {@code count} times.
+	 *  If {@code count} is less than or equal to 0, the empty string is returned.
 	 * @param s String to duplicate
 	 * @param count Number of times to duplicate
 	 * @return Duplicated string.
@@ -146,28 +144,27 @@ public class StringUtils {
 	}
 
 	/**
-	 *  Duplicates the given character <code>count</code> times to the Writer.
-	 *  If <code>count</code> is less than or equal to 0, this is a no-op.
+	 *  Duplicates the given character {@code count} times to the Writer.
+	 *  If {@code count} is less than or equal to 0, this is a no-op.
 	 * @param output Writer to receive duplicated results
 	 * @param c Character to duplicate
 	 * @param count Number of times to duplicate
-	 * @throws java.io.IOException If an error occurs on the Writer
 	 */
-	public static void multiply(Writer output, char c, int count) throws IOException {
+	public static void multiply(PrintWriter output, char c, int count) {
 		for(int i=0; i<count; i++) {
 			output.write(c);
 		}
 	}
 
 	/**
-	 *  Duplicates the given string <code>count</code> times to the Writer.
-	 *  If <code>count</code> is less than or equal to 0, this is a no-op.
+	 *  Duplicates the given string {@code count} times to the Writer.
+	 *  If {@code count} is less than or equal to 0, this is a no-op.
 	 * @param output Writer to receive duplicated results
 	 * @param s String to duplicate
 	 * @param count Number of times to duplicate
-	 * @throws java.io.IOException If an error occurs on the Writer
 	 */
-	public static void multiply(Writer output, String s, int count) throws IOException {
+	@SuppressWarnings({"SameParameterValue"})
+	public static void multiply(PrintWriter output, String s, int count) {
 		for(int i=0; i<count; i++) {
 			output.write(s);
 		}
@@ -183,13 +180,11 @@ public class StringUtils {
 	 * @param prependWith The string to prepend to each line.
 	 * @return The modified string.
 	 */
+	@SuppressWarnings({"SameParameterValue"})
 	public static String prependEachLine(String s, String prependWith) {
 		StringWriter sw = new StringWriter(s.length()+(prependWith.length()*20));
-		try {
-			prependEachLine(sw, s, prependWith);
-		} catch(IOException ex) {
-			// won't ever happen
-		}
+		//noinspection IOResourceOpenedButNotSafelyClosed
+		prependEachLine(new PrintWriter(sw), s, prependWith);
 		return sw.toString();
 	}
 
@@ -202,9 +197,8 @@ public class StringUtils {
 	 * @param output The writer to recieve the modified string.
 	 * @param s The input string.
 	 * @param prependWith The string to prepend to each line.
-	 * @throws java.io.IOException if an error occurs during the writing to the output.
 	 */
-	public static void prependEachLine(Writer output, String s, String prependWith) throws IOException {
+	public static void prependEachLine(PrintWriter output, String s, String prependWith) {
 		if(s.length() == 0) {
 			return;
 		}

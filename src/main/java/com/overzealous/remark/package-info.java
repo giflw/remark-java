@@ -17,10 +17,12 @@
 /**
  * The root package for the OverZealous Creations, LLC, Remark library.
  *
- * This library is used to convert HTML files back into valid Markdown code.
+ * <p>This library is used to processConvert HTML files back into valid Markdown code.</p>
+ * 
+ * <p>To get started, check out the {@link com.overzealous.remark.Remark} class.</p>
  *
- * For more information, see <a href="https://bitbucket.org/OverZealous/remark">the BitBucket Repository</a>.
+ * <p>For more information, see <a href="https://bitbucket.org/OverZealous/remark">the BitBucket Repository</a>.</p>
  *
- * @since 1.0
+ * @since 0.7
  */
 package com.overzealous.remark;

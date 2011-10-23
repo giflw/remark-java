@@ -65,11 +65,11 @@ public class Options {
 		MULTI_MARKDOWN(false,false,true,false,true);
 
 		// Private fields
-		private boolean removed;
-		private boolean leftAsHtml;
-		private boolean convertedToText;
-		private boolean renderedAsCode;
-		private boolean colspanEnabled;
+		private final boolean removed;
+		private final boolean leftAsHtml;
+		private final boolean convertedToText;
+		private final boolean renderedAsCode;
+		private final boolean colspanEnabled;
 
 		private Tables(boolean removed, boolean leftAsHtml, boolean convertedToText, boolean renderedAsCode, boolean colspanEnabled) {
 			this.removed = removed;
@@ -139,8 +139,8 @@ public class Options {
 		ENABLED_BACKTICK(true, '`');
 
 		// private fields
-		private boolean enabled;
-		private char separatorCharacter;
+		private final boolean enabled;
+		private final char separatorCharacter;
 
 		private FencedCodeBlocks(boolean enabled, char separatorCharacter) {
 			this.enabled = enabled;
@@ -172,14 +172,14 @@ public class Options {
 		/**
 		 * Uses the default mode, which allows in-word emphasis.  Because Remark only uses
 		 * asterisks for spacing ({@code '*'}), this mode works with parsers that disable
-		 * in-word underscores ({@code '_'}).
+		 * in-word underscores ({@code '_'}) but not in-word asterisks.
 		 */
 		NORMAL(true, false),
 		/**
 		 * Adds spaces around the in-word emphasis characters.  This will actually render different output.
 		 *
 		 * For example, {@code My<em>Example</em>Word} becomes {@code My *Example* Word}.  This will actually
-		 * render as <code>My <em>Example</em> Word</code>.
+		 * render as {@code My <em>Example</em> Word}.
 		 */
 		ADD_SPACES(true, true),
 		/**
@@ -191,8 +191,8 @@ public class Options {
 		 */
 		REMOVE_EMPHASIS(false, false);
 
-		private boolean emphasisPreserved;
-		private boolean additionalSpacingNeeded;
+		private final boolean emphasisPreserved;
+		private final boolean additionalSpacingNeeded;
 
 		InWordEmphasis(boolean emphasisPreserved, boolean additionalSpacingNeeded) {
 			this.emphasisPreserved = emphasisPreserved;
@@ -277,6 +277,9 @@ public class Options {
 	 * Creates and returns a new Options set with the default options
 	 * compatible with the base pegdown configuration.
 	 *
+	 * <p>Please note: if you are using pegdown version 1.0.2 or older, you'll need to
+	 * manually enable {@link #fixPegdownStrongEmphasisInLinks}.</p>
+	 *
 	 * <p>Enables:</p>
 	 * <ul>
 	 *     <li>hardwraps</li>
@@ -284,6 +287,7 @@ public class Options {
 	 *
 	 * @return Options for pegdown compatibility
 	 */
+	@SuppressWarnings({"WeakerAccess"})
 	public static Options pegdownBase() {
 		Options opts = new Options();
 		opts.inWordEmphasis = InWordEmphasis.REMOVE_EMPHASIS;
@@ -295,10 +299,13 @@ public class Options {
 	 * Creates and returns a new Options set with the default options
 	 * compatible with pegdown configured with all extensions.
 	 *
+	 * <p>Please note: if you are using pegdown version 1.0.2 or older, you'll need to
+	 * manually enable {@link #fixPegdownStrongEmphasisInLinks}.</p>
+	 *
 	 * <p>Enables:</p>
 	 * <ul>
 	 *     <li>hardwraps</li>
-	 *     <li>Github fencedCodeBlocks</li>
+	 *     <li>Markdown Extra fencedCodeBlocks</li>
 	 *     <li>MultiMarkdown tables</li>
 	 *     <li>definitionLists</li>
 	 *     <li>abbreviations</li>
@@ -311,7 +318,7 @@ public class Options {
 	public static Options pegdownAllExtensions() {
 		Options opts = pegdownBase();
 		opts.hardwraps = true;
-		opts.fencedCodeBlocks = FencedCodeBlocks.ENABLED_BACKTICK;
+		opts.fencedCodeBlocks = FencedCodeBlocks.ENABLED_TILDE;
 		opts.reverseHtmlSmartPunctuation = true;
 		opts.reverseHtmlSmartQuotes = true;
 		opts.reverseUnicodeSmartPunctuation = true;
@@ -326,7 +333,7 @@ public class Options {
 
 	/**
 	 * Creates and returns a new Options set with the default options
-	 * compatible with github-flavor Markdown.
+	 * compatible with github-flavored Markdown.
 	 *
 	 * <p>Enables:</p>
 	 * <ul>
@@ -336,7 +343,7 @@ public class Options {
 	 *     <li>autoLinks</li>
 	 * </ul>
 	 *
-	 * @return Options for pegdown compatibility
+	 * @return Options for github compatibility
 	 */
 	public static Options github() {
 		Options opts = new Options();
@@ -349,7 +356,7 @@ public class Options {
 
 	/**
 	 * If true, {@code <br/>}s are replaced with a simple linebreak.
-	 * If false, {@code <br/>}s are replaced with a two spaces followed by a linebreak.
+	 * <p>If false, {@code <br/>}s are replaced with a two spaces followed by a linebreak (default).</p>
 	 */
 	public boolean hardwraps = false;
 
@@ -360,13 +367,13 @@ public class Options {
 
 	/**
 	 * If true, place the URLs for links inline.
-	 * Otherwise, generate link IDs and place at the end.
+	 * <p>Otherwise, generate link IDs and place at the end (the default).</p>
 	 */
 	public boolean linksInline = false;
 
 	/**
 	 * If true, link IDs are simply incremented as they are found.
-	 * Otherwise, Remark attempts to generate unique link IDs based on the link description.
+	 * <p>Otherwise, Remark attempts to generate unique link IDs based on the link description.</p>
 	 */
 	public boolean simpleLinkIds = false;
 
@@ -377,13 +384,13 @@ public class Options {
 
 	/**
 	 * If true, replace all smart quote HTML entities (e.g:
-	 * {@code &ldquo;} with simplified characters (e.g: <code>&quot;</code>).
+	 * {@code &ldquo;} with simplified characters (e.g: {@code "}).
 	 */
 	public boolean reverseHtmlSmartQuotes = false;
 
 	/**
 	 * If true, replace all smart quote unicode characters (e.g:
-	 * <code>&#0147;</code>) with simplified characters (e.g: <code>&quot;</code>).
+	 * &#0147) with simplified characters (e.g: {@code "}).
 	 */
 	public boolean reverseUnicodeSmartQuotes = false;
 
@@ -418,9 +425,9 @@ public class Options {
 	 * output.
 	 *
 	 * Example:
-	 *     <blockquote><code>&lt;a href="http://www.example.com"&gt;http://www.example.com&lt;/a&gt;</code></blockquote>
+	 *     <blockquote>{@code <a href="http://www.example.com">http://www.example.com</a>}</blockquote>
 	 * becomes
-	 *     <blockquote><code>http://www.example.com</code></blockquote>
+	 *     <blockquote>{@code http://www.example.com}</blockquote>
 	 */
 	public boolean autoLinks = false;
 
@@ -434,12 +441,20 @@ public class Options {
 	 * Configures how to handle code blocks.  By default, code blocks are only configured
 	 * using the indented format supported by Markdown.  This allows fenced code blocks when necessary.
 	 */
+	@SuppressWarnings({"WeakerAccess"})
 	public FencedCodeBlocks fencedCodeBlocks = FencedCodeBlocks.DISABLED;
+
+	/**
+	 * Number of times to repeat the fencedCodeBlock character. (Defaults to 10.)
+	 */
+	@SuppressWarnings({"CanBeFinal"})
+	public int fencedCodeBlocksWidth = 10;
 
 	/**
 	 * Allows the addition of extra HTML tags that can be left in the output.
 	 * Please note that this does not override default handling (for example, {@code <em>} tags).
 	 */
+	@SuppressWarnings({"WeakerAccess"})
 	public Set<IgnoredHtmlElement> ignoredHtmlElements = new HashSet<IgnoredHtmlElement>();
 
 	/**
@@ -450,8 +465,11 @@ public class Options {
 	 * This option causes Remark to replace items like {@code [***my important link***][link-id]} with just
 	 * bold text, like {@code [**my important link**][link-id]}.
 	 *
+	 * <strong>Note: this was fixed in release 1.1.0!</strong>
+	 *
 	 * @see <a href="https://github.com/sirthias/pegdown/issues/34">Pegdown Issue #34</a>
 	 */
+	@SuppressWarnings({"CanBeFinal"})
 	public boolean fixPegdownStrongEmphasisInLinks = false;
 
 
@@ -505,55 +523,6 @@ public class Options {
 			inWordEmphasis = InWordEmphasis.NORMAL;
 		}
 		return inWordEmphasis;
-	}
-
-	@SuppressWarnings({"RedundantIfStatement"})
-	@Override
-	public boolean equals(Object o) {
-		if(this == o) { return true; }
-		if(o == null || getClass() != o.getClass()) { return false; }
-
-		Options options = (Options) o;
-
-		if(abbreviations != options.abbreviations) { return false; }
-		if(autoLinks != options.autoLinks) { return false; }
-		if(definitionLists != options.definitionLists) { return false; }
-		if(hardwraps != options.hardwraps) { return false; }
-		if(headerIds != options.headerIds) { return false; }
-		if(linksInline != options.linksInline) { return false; }
-		if(reverseHtmlSmartPunctuation != options.reverseHtmlSmartPunctuation) { return false; }
-		if(reverseHtmlSmartQuotes != options.reverseHtmlSmartQuotes) { return false; }
-		if(reverseUnicodeSmartPunctuation != options.reverseUnicodeSmartPunctuation) { return false; }
-		if(reverseUnicodeSmartQuotes != options.reverseUnicodeSmartQuotes) { return false; }
-		if(simpleLinkIds != options.simpleLinkIds) { return false; }
-		if(fencedCodeBlocks != options.fencedCodeBlocks) { return false; }
-		if(ignoredHtmlElements != null ? !ignoredHtmlElements.equals(options.ignoredHtmlElements) : options.ignoredHtmlElements != null) {
-			return false;
-		}
-		if(inWordEmphasis != options.inWordEmphasis) { return false; }
-		if(tables != options.tables) { return false; }
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		int result = (hardwraps ? 1 : 0);
-		result = 31 * result + (inWordEmphasis != null ? inWordEmphasis.hashCode() : 0);
-		result = 31 * result + (linksInline ? 1 : 0);
-		result = 31 * result + (simpleLinkIds ? 1 : 0);
-		result = 31 * result + (tables != null ? tables.hashCode() : 0);
-		result = 31 * result + (reverseHtmlSmartQuotes ? 1 : 0);
-		result = 31 * result + (reverseUnicodeSmartQuotes ? 1 : 0);
-		result = 31 * result + (reverseHtmlSmartPunctuation ? 1 : 0);
-		result = 31 * result + (reverseUnicodeSmartPunctuation ? 1 : 0);
-		result = 31 * result + (definitionLists ? 1 : 0);
-		result = 31 * result + (abbreviations ? 1 : 0);
-		result = 31 * result + (autoLinks ? 1 : 0);
-		result = 31 * result + (headerIds ? 1 : 0);
-		result = 31 * result + (fencedCodeBlocks != null ? fencedCodeBlocks.hashCode() : 0);
-		result = 31 * result + (ignoredHtmlElements != null ? ignoredHtmlElements.hashCode() : 0);
-		return result;
 	}
 
 }

@@ -16,7 +16,10 @@
 
 package com.overzealous.remark.util;
 
-import java.io.*;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -67,7 +70,7 @@ public final class BlockWriter extends PrintWriter {
 	// handles the actual setting up of the buffer
 	private static BlockWriter create(StringWriter buffer) {
 		@SuppressWarnings({"IOResourceOpenedButNotSafelyClosed"})
-		BlockWriter bw = new BlockWriter(new BufferedWriter(buffer));
+		BlockWriter bw = new BlockWriter(buffer);
 		bw.buffer = buffer;
 		return bw;
 	}
@@ -119,12 +122,11 @@ public final class BlockWriter extends PrintWriter {
 			// loop over the cbuf and see if it contains any newlines.
 			for(int i=off; i<off+len; i++) {
 				if(cbuf[i] == '\n') {
-					i++;
 					// if this is a newline, then write what we have, and handle the prepend
-					write(cbuf, start, i-start);
+					write(cbuf, start, (i+1)-start);
 					writePrepend();
 					// start the next round at the newline
-					start = i;
+					start = i+1;
 				}
 			}
 			// write tail
@@ -158,12 +160,11 @@ public final class BlockWriter extends PrintWriter {
 			// loop over the string and see if it contains any newlines.
 			for(int i=off; i<off+len; i++) {
 				if(s.charAt(i) == '\n') {
-					i++;
 					// if this is a newline, then write what we have, and handle the prepend
-					write(s, start, i-start);
+					write(s, start, (i+1)-start);
 					writePrepend();
 					// start the next round at the newline
-					start = i;
+					start = i+1;
 				}
 			}
 			// write tail
@@ -234,7 +235,6 @@ public final class BlockWriter extends PrintWriter {
 
 	/**
 	 * Writes the prepend string to the output writer.
-	 * This method keeps track of the current status to prevent recursion.
 	 */
 	private void writePrepend() {
 		super.write(prependNewLineString, 0, prependNewLineString.length());
@@ -258,7 +258,7 @@ public final class BlockWriter extends PrintWriter {
 			// if this is the first block printed, then don't actually do anything.
 			empty = false;
 		} else {
-			// otherwise, print two lines, so an empty line occurs between the
+			// otherwise, print two lines, so an empty line occurs between the blocks
 			println();
 			println();
 		}
@@ -308,6 +308,7 @@ public final class BlockWriter extends PrintWriter {
 	 * Returns true if nothing has been written to the stream yet.
 	 * @return true if nothing has been written yet.
 	 */
+	@SuppressWarnings({"UnusedDeclaration"})
 	public boolean isEmpty() {
 		return empty;
 	}
@@ -317,6 +318,7 @@ public final class BlockWriter extends PrintWriter {
 	 *
 	 * @return the buffer for this BlockWriter
 	 */
+	@SuppressWarnings({"UnusedDeclaration"})
 	public StringWriter getBuffer() {
 		return buffer;
 	}
@@ -325,6 +327,7 @@ public final class BlockWriter extends PrintWriter {
 	 * Returns the string being prepended to new lines, if set.
 	 * @return String that gets prepended before each new line, or null if not set.
 	 */
+	@SuppressWarnings({"UnusedDeclaration"})
 	public String getPrependNewlineString() {
 		return prependNewLineString;
 	}

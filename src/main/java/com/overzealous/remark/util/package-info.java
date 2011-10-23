@@ -17,8 +17,8 @@
 /**
  * This package contains utility classes that assist the main parser in rendering Markdown output.
  *
- * For more information, see <a href="https://bitbucket.org/OverZealous/remark">the BitBucket Repository</a>.
+ * <p>For more information, see <a href="https://bitbucket.org/OverZealous/remark">the BitBucket Repository</a>.</p>
  *
- * @since 1.0
+ * @since 0.7
  */
 package com.overzealous.remark.util;

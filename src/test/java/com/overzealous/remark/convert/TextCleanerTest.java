@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.overzealous.remark.nodewalker;
+package com.overzealous.remark.convert;
 
 import com.overzealous.remark.Options;
 import com.overzealous.remark.util.TestUtils;
@@ -26,9 +26,9 @@ import org.junit.Test;
  */
 public class TextCleanerTest {
 
-	static final TextCleaner BASIC = new TextCleaner(Options.markdown());
+	private static final TextCleaner BASIC = new TextCleaner(Options.markdown());
 
-	static final TextCleaner FULL = new TextCleaner(Options.pegdownAllExtensions());
+	private static final TextCleaner FULL = new TextCleaner(Options.pegdownAllExtensions());
 
 	private String loadOut(String name) {
 		return load(name, "out");
@@ -43,7 +43,7 @@ public class TextCleanerTest {
 	}
 
 	private String load(String name, String type) {
-		return TestUtils.readResourceToString("/textcleaner/"+name+"."+type+".txt");
+		return TestUtils.readResourceToString("/textcleaner/" + name + '.' + type + ".txt");
 	}
 
 	private void assertEqualsAndPrint(String expected, String result) {
@@ -95,9 +95,10 @@ public class TextCleanerTest {
 
 	@Test
 	public void testCleanInlineCodeLotsOfTicks() throws Exception {
-		Assert.assertEquals("```` ``t```i`ck` ````", BASIC.cleanInlineCode("``t```i`ck`"));
+		Assert.assertEquals("```` ``t```i`ck` ````", BASIC.cleanInlineCode("``t`&#96;`i`ck`"));
 	}
 
+	/** Disabled because this is too dependent on the computer
 	@Test
 	public void testReplacementPerformance() throws Exception {
 		String basic = loadBasicIn();
@@ -119,4 +120,5 @@ public class TextCleanerTest {
 		// ensure that it doesn't take more than 1ms per test.
 		Assert.assertTrue("ReplacementPerformance is too slow.", expectedTime > (end-start));
 	}
+	*/
 }

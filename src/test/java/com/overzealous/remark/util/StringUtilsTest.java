@@ -19,6 +19,7 @@ package com.overzealous.remark.util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
@@ -26,13 +27,15 @@ import java.io.StringWriter;
  */
 public class StringUtilsTest {
 
-	private StringWriter testWriter = new StringWriter();
+	private final StringWriter testWriter = new StringWriter();
+	private final PrintWriter testPrintWriter = new PrintWriter(testWriter);
 
-	private StringWriter getWriter() {
+	private PrintWriter getWriter() {
 		testWriter.getBuffer().setLength(0);
-		return testWriter;
+		return testPrintWriter;
 	}
 
+	@SuppressWarnings({"RedundantThrows"})
 	private void assertWriter(String expected) throws Exception {
 		Assert.assertEquals(expected, testWriter.toString());
 	}

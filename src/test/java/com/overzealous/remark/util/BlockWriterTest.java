@@ -116,10 +116,10 @@ public class BlockWriterTest {
 	public void testPrependString() throws Exception {
 		BlockWriter bw = BlockWriter.create();
 		bw.setPrependNewlineString("XXXX");
-		bw.write("abc\ndef\nghi");
+		bw.write("abc\n\ndef\nghi");
 		bw.write("\njkl");
 
-		Assert.assertEquals("XXXXabc\nXXXXdef\nXXXXghi\nXXXXjkl", bw.toString());
+		Assert.assertEquals("XXXXabc\nXXXX\nXXXXdef\nXXXXghi\nXXXXjkl", bw.toString());
 	}
 
 	@Test

@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package com.overzealous.remark.nodewalker;
+package com.overzealous.remark.convert;
 
 import com.overzealous.remark.Options;
 import com.overzealous.remark.util.StringUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,8 +41,8 @@ public class TextCleaner {
 	 * Internal class simply used to hold the various escape regexes.
 	 */
 	private class Escape {
-		Pattern pattern;
-		String replacement;
+		final Pattern pattern;
+		final String replacement;
 		public Escape(String pattern, String replacement) {
 			this.pattern = Pattern.compile(pattern);
 			this.replacement = replacement;
@@ -53,8 +57,10 @@ public class TextCleaner {
 	private Pattern unicodeReplacementsPattern = null;
 	/** List of possible escapes */
 	private List<Escape> escapes;
+	private Pattern unescapeLeadingChars;
 
-	private static final Pattern LINEBREAK_REMOVER = Pattern.compile("(\\s*\\n)+");
+	private static final Pattern EMPTY_MATCHER = Pattern.compile("\\s+", Pattern.DOTALL);
+	private static final Pattern LINEBREAK_REMOVER = Pattern.compile("(\\s*\\r?+\\n)+");
 
 	/**
 	 * Create a new TextCleaner based on the configured options.
@@ -165,16 +171,20 @@ public class TextCleaner {
 		}
 		leadingChars.append("\\E])");
 		escapes.add(new Escape(leadingChars.toString(), "$1\\\\$2"));
+
+		// setup the leading character reverser
+		// this is a bit of a hack to undo leading character escapes.
+		unescapeLeadingChars = Pattern.compile(leadingChars.insert(6, "\\\\").toString());
 	}
 
 	/**
 	 * Clean the given input text based on the original configuration Options.
 	 * Newlines are also replaced with a single space.
 	 *
-	 * @param input The text to be cleaned.
+	 * @param input The text to be cleaned. Can be any object. JSoup nodes are handled specially.
 	 * @return The cleaned text.
 	 */
-	public String clean(String input) {
+	public String clean(Object input) {
 		return clean(input, true);
 	}
 
@@ -182,10 +192,10 @@ public class TextCleaner {
 	 * Clean the given input text based on the original configuration Options.
 	 * The text is treat as code, so it is not escaped, and newlines are preserved.
 	 *
-	 * @param input The text to be cleaned.
+	 * @param input The text to be cleaned. Can be any object. JSoup nodes are handled specially.
 	 * @return The cleaned text.
 	 */
-	public String cleanCode(String input) {
+	public String cleanCode(Object input) {
 		return clean(input, false);
 	}
 
@@ -193,13 +203,25 @@ public class TextCleaner {
 	 * Clean the given input text based on the original configuration Options.
 	 * Optionally, don't escape special characters.
 	 *
-	 * @param input The text to be cleaned.
+	 * @param oinput The text to be cleaned. Can be any object. JSoup nodes are handled specially.
 	 * @param normalText If false, don't escape special characters.  This is usually only used for
 	 * 					 inline code or code blocks, because they don't need to be escaped.
 	 * @return The cleaned text.
 	 */
-	protected String clean(String input, boolean normalText) {
-		if(normalText) {
+	private String clean(Object oinput, boolean normalText) {
+		String input;
+		if(oinput instanceof TextNode) {
+			input = getTextNodeText((TextNode)oinput, normalText);
+		} else if(oinput instanceof Element) {
+			input = ((Element)oinput).text();
+		} else {
+			input = oinput.toString();
+		}
+		String result;
+		if(input.length() == 0) {
+			// not seen, so just return an empty string.
+			result = "";
+		} else if(normalText) {
 			// For non-code text, newlines are _never_ allowed.
 			// Replace one or more set of whitespace chars followed by a newline with a single space.
 			input = LINEBREAK_REMOVER.matcher(input).replaceAll(" ");
@@ -212,14 +234,15 @@ public class TextCleaner {
 			if(unicodeReplacementsPattern != null) {
 				output = doReplacements(output, unicodeReplacementsPattern);
 			}
-			return output.toString();
+			result = output.toString();
 		} else {
 			// we have to revert ALL HTML entities for code, because they will end up
 			// double-encoded by markdown
 			// we also don't need to worry about escaping anything
 			// note: we have to manually replace &apos; because it is ignored by StringEscapeUtils for some reason.
-			return StringEscapeUtils.unescapeHtml4(input.replace("&apos;", "'"));
+			result = StringEscapeUtils.unescapeHtml4(input.replace("&apos;", "'"));
 		}
+		return result;
 	}
 
 	/**
@@ -256,10 +279,10 @@ public class TextCleaner {
 	 *
 	 * This method also adds the leading and trailing {@code '`'} or {@code '```'} as necessary.
 	 *
-	 * @param input String to clean
+	 * @param input String to clean. Can be any object. JSoup nodes are handled specially.
 	 * @return The cleaned text.
 	 */
-	public String cleanInlineCode(String input) {
+	public String cleanInlineCode(Object input) {
 		String output = clean(input, false).replace('\n', ' ');
 		if(output.indexOf('`') != -1) {
 			String prepend = "";
@@ -278,7 +301,12 @@ public class TextCleaner {
 		return output;
 	}
 
-	protected String getDelimiter(String input) {
+	public String unescapeLeadingCharacters(String input) {
+		// removes any leading escapes...
+		return unescapeLeadingChars.matcher(input).replaceAll("$1$2");
+	}
+
+	String getDelimiter(String input) {
 		int max = 0;
 		int counter = 0;
 		for(int i=0; i<input.length(); i++) {
@@ -291,7 +319,72 @@ public class TextCleaner {
 		}
 		// check in case the last tick was at the end.
 		max = Math.max(max, counter);
-		return StringUtils.multiply('`', max+1);
+		return StringUtils.multiply('`', max + 1);
+	}
+
+	private String getTextNodeText(TextNode tn, boolean normalText) {
+		String input = normalText ? tn.text() : tn.getWholeText();
+		Node prev = tn.previousSibling();
+		Node next = tn.nextSibling();
+		boolean parentIsBlock = isBlock(tn.parent());
+		if(isBlock(prev)) {
+			input = ltrim(input);
+		} else if(prev == null && parentIsBlock) {
+			input = ltrim(input);
+		} else if(normalText && prev instanceof TextNode) {
+			TextNode tprev = (TextNode)prev;
+			if(EMPTY_MATCHER.matcher(tprev.text()).matches()) {
+				input = ltrim(input);
+			}
+		}
+		if(input.length() > 0) {
+			if(isBlock(next)) {
+				input = rtrim(input);
+			} else if(next == null && parentIsBlock) {
+				input = rtrim(input);
+			} else if(normalText && next instanceof TextNode) {
+				TextNode tnext = (TextNode)next;
+				if(EMPTY_MATCHER.matcher(tnext.text()).matches()) {
+					input = rtrim(input);
+				}
+			}
+		}
+		return input;
+	}
+
+	private boolean isBlock(Node n) {
+		boolean block = false;
+		if(n != null && n instanceof Element) {
+			Element el = (Element)n;
+			block = el.isBlock() || el.tagName().equals("br");
+		}
+		return block;
+	}
+
+	private String ltrim(String s) {
+		int start = 0;
+		while((start+1 <= s.length()) &&
+					  EMPTY_MATCHER.matcher(s.substring(start, start+1)).matches()) {
+			start++;
+		}
+		String ret = "";
+		if(start != s.length()) {
+			ret = s.substring(start);
+		}
+		return ret;
+	}
+
+	private String rtrim(String s) {
+		int end = s.length();
+		while((end-1 >= 0) &&
+					  EMPTY_MATCHER.matcher(s.substring(end-1, end)).matches()) {
+			end--;
+		}
+		String ret = "";
+		if(end != 0) {
+			ret = s.substring(0, end);
+		}
+		return ret;
 	}
 
 }
