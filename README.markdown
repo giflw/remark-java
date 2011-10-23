@@ -18,7 +18,7 @@
 	 * Mobile devices often not support rich text editing through the web browser.
 	 * So, instead, render a plain text field with the raw markdown text.
 	 * Because markdown is relatively easy to read and edit, the user can make simple changes without struggling with hundreds of messy HTML tags.
-	 * If necessary, **Remark** can accept this input as well, and strip any HTML tags for security.
+	 * If necessary, **Remark** can be fed this input as well, and strip any HTML tags for security.
 
 ## Advanced Features
 
@@ -37,18 +37,41 @@
  * Autolinks — a link that has the same content as it's label (and starts with http or https) is simply rendered as is, like `http://www.overzealous.com`
  * [Markdown Extra definition lists][]
  * [Markdown Extra abbreviations][]
+ * [Markdown Extra header IDs][]
  * Fenced code blocks, using either [Markdown Extra's format][Markdown Extra fenced code block] using `~~~`, or [Github's format][Github fenced code block] using ` ``` `
  * Customization of allowed HTML tags - not really recommended.
 
 The basic theory is that you match the extensions to your Markdown conversion library.
 
----
-
 ## A Note on Forking:
 
-Want to fork this project?  *Great!*  However, please note that I use [hglfow][] to manage the develop-release cycle.  If you are uncomfortable with that, that's fine, too!  Just switch to the **develop** branch before working, or I won't be able to easily merge the changes back in.
+Want to fork this project?  *Great!*  However, please note that I use [hgflow][] to manage the develop-release cycle.  If you are uncomfortable with that, that's fine, too!  Just switch to the **develop** branch before working, or I won't be able to easily merge the changes back in.
 
 Source code build is done via [Gradle][].
+
+## Dependencies
+
+The only runtime dependency for **Remark** is [jsoup][].  jsoup uses the [MIT License][jsoup license], which is roughly comparable to the [Apache 2.0 License][] used by Remark.
+
+During testing, **Remark** also depends on some additional libraries, which are automatically downloaded by the gradle build script.
+
+## License
+
+**Remark** is released under the [Apache 2.0 license][].
+
+	Copyright 2011 OverZealous Creations, LLC
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
 
 [Markdown]: http://daringfireball.net/projects/markdown/
 [Markdown Extra]: http://michelf.com/projects/php-markdown/extra/
@@ -56,11 +79,14 @@ Source code build is done via [Gradle][].
 [Markdown Extra definition lists]: http://michelf.com/projects/php-markdown/extra/#def-list
 [Markdown Extra fenced code block]: http://michelf.com/projects/php-markdown/extra/#fenced-code-blocks
 [Markdown Extra abbreviations]: http://michelf.com/projects/php-markdown/extra/#abbr
+[Markdown Extra header IDs]: http://michelf.com/projects/php-markdown/extra/#header-id
 [MultiMarkdown]: http://fletcherpenney.net/multimarkdown/
 [MultiMarkdown tables]: http://fletcher.github.com/peg-multimarkdown/#tables
 [Github fenced code block]: http://github.github.com/github-flavored-markdown/
 [dojo_rte]: http://dojotoolkit.org/reference-guide/dijit/Editor.html
 [other_rtes]: http://www.queness.com/post/212/10-jquery-and-non-jquery-javascript-rich-text-editors
 [jsoup]: http://jsoup.org/
+[jsoup license]: http://jsoup.org/license
 [hgflow]: https://bitbucket.org/yinwm/hgflow/wiki/Home
 [Gradle]: http://gradle.org/
+[Apache 2.0 License]: http://www.apache.org/licenses/LICENSE-2.0

@@ -1,11 +1,12 @@
 apply plugin: 'java'
+apply plugin: 'maven'
 
 //---------------------------------------------------------------------------
 // Base properties
 //---------------------------------------------------------------------------
 
+description = 'The OverZealous Creations Remark library.'
 sourceCompatibility = 1.5
-version = '0.0.1'
 
 //---------------------------------------------------------------------------
 // Dependencies
@@ -17,7 +18,10 @@ repositories {
 
 dependencies {
     compile group: 'org.jsoup', name: 'jsoup', version: '1.6.+'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.+'
+	compile group: 'commons-cli', name: 'commons-cli', version: '1.+'
     testCompile group: 'junit', name: 'junit', version: '4.+'
+	testCompile group: 'commons-io', name: 'commons-io', version: '2.+'
 }
 
 //---------------------------------------------------------------------------
@@ -25,8 +29,16 @@ dependencies {
 //---------------------------------------------------------------------------
 jar {
     manifest {
-        attributes 'Main-Class': 'com.overzealous.remark.Remark'
+        attributes 'Main-Class': 'com.overzealous.remark.Main'
     }
+}
+
+javadoc {
+	configure(options) {
+		options.links = [ 'http://download.oracle.com/javase/6/docs/api/', 'http://jsoup.org/apidocs/' ]
+		options.author = true
+		options.bottom = '<div style="font-size:.75em; font-style:italic; text-align:center;">&copy; 2011 <a href="http://www.overzealous.com/">OverZealous Creations, LLC</a> - <a href="https://bitbucket.org/OverZealous/remark">BitBucket Repository</a></div>'
+	}
 }
 
 
@@ -35,42 +47,90 @@ jar {
 // Custom tasks
 //---------------------------------------------------------------------------
 
-task(runRemark, dependsOn: 'classes', type: JavaExec) {
-    main = 'com.overzealous.remark.Remark'
-    classpath = sourceSets.main.runtimeClasspath
-    //args ''
-    //systemProperty 'simple.message', 'Hello '
+task runRemark(dependsOn: 'classes', description: "Runs the command-line Remark class") << {
+	def exit = javaexec{
+		main = 'com.overzealous.remark.Main'
+		classpath = sourceSets.main.runtimeClasspath
+		//args ''
+		//systemProperty 'simple.message', 'Hello '
+	}
+	if(exit.exitValue != 0) {
+		//println exit
+		println "exit value: ${exit.exitValue}"
+	}
 }
 
+task bumpVersion(description: 'Bumps the app Version for release.') << {
+	//noinspection GroovyAssignabilityCheck
+	def components = version.split('\\.').collect { Integer.parseInt(it.replace('-SNAPSHOT', ''))}
+	components[2] += 1
+	def nextIntegrationVersion = components.join('.')+"-SNAPSHOT"
+	println "Bumping $version to $nextIntegrationVersion"
+	def newProps = file("gradle.properties").text.replace(version, nextIntegrationVersion)
+	file("gradle.properties").text = newProps
+}
 
-task intellijSync << {
-    description = 'Add gradle dependecies to IntelliJ project library'
+task intellijSync(description: 'Add gradle dependecies to IntelliJ project library') << {
+
+	// Add source and javadoc artifacts
+	configurations.each{
+		it.dependencies.each { dep ->
+			['jar':null,'source':'sources','javadoc':'javadoc'].each{arType, arClassifier ->
+				dep.artifact {
+					name = dep.name
+					extension = 'jar'
+					type = arType
+					classifier = arClassifier
+				}
+			}
+		}
+	}
 
     final def librariesDir = new File(".idea${File.separator}libraries")
     librariesDir.mkdirs()
 
     final def userHomeGradle = project.gradle.gradleUserHomeDir
-    println "Set the USER_HOME_GRADLE variable to '$userHomeGradle.path'"
+	if(!userHomeGradle) {
+    	println "Set the USER_HOME_GRADLE variable to '$userHomeGradle.path'"
+	}
 
     def makeJarList = { path ->
-        path.split(File.pathSeparator).collect {
+		//noinspection GroovyAssignabilityCheck
+		path.split(File.pathSeparator).collect {
             it.replaceAll userHomeGradle.path, "\\\$USER_HOME_GRADLE\\\$"
         }
     }
     final def compileJars = makeJarList(configurations.compile.asPath)
     final def testJars = makeJarList(configurations.testCompile.asPath) - compileJars
 
-    def createLibrary = { fileName, libraryName, jars ->
-        final def gradleLibXml = new File(librariesDir, fileName)
+    def createLibrary = { String fileName, String libraryName, jars ->
+		final def gradleLibXml = new File(librariesDir, fileName)
         gradleLibXml.write """
 <component name="libraryTable">
 <library name="$libraryName"/>
 </component>"""
         final def xmlRoot = new XmlParser().parse(gradleLibXml)
         final def classesNode = xmlRoot.library[0].appendNode('CLASSES')
+		final def sourcesNode = xmlRoot.library[0].appendNode('SOURCES')
+		final def javadocNode = xmlRoot.library[0].appendNode('JAVADOC')
+
+        println "Creating $libraryName";
 
         jars.each { jar ->
-            classesNode.appendNode('root', [url: "jar://$jar!/"])
+			def type;
+			if(jar ==~ /.*-sources\.jar$/) {
+				type = 'sources';
+				sourcesNode.appendNode('root', [url: "jar://$jar!/"])
+			} else if(jar ==~ /.*-javadoc\.jar$/) {
+				type = 'javadoc';
+				javadocNode.appendNode('root', [url: "jar://$jar!/"])
+			} else {
+				type = 'class';
+            	classesNode.appendNode('root', [url: "jar://$jar!/"])
+			}
+			def jarShortName = jar.replace('$USER_HOME_GRADLE$/cache/', '')
+			println " - Added $type jar $jarShortName"
+
         }
 
         def writer = new StringWriter()
@@ -81,23 +141,3 @@ task intellijSync << {
     createLibrary 'Gradle_Libraries.xml', 'Gradle Libraries', compileJars
     createLibrary 'Gradle_Test_Libraries.xml', 'Gradle Test Libraries', testJars
 }
-
-/*
-task intellijModuleSync(dependsOn: intellijSync) << {
-    final def moduleFile = new File('your-module-here.iml') // TODO rename to match your module's name
-    def root = new XmlParser().parse(moduleFile)
-    def newModuleRootManager = root.component.find {it.'@name' == 'NewModuleRootManager'}
-    def orderEntry = newModuleRootManager.orderEntry.find {
-        it.'@type' == 'library' && it.'@name' == GRADLE_TEST_LIBRARIES_ID
-    }
-    if (orderEntry) {
-        newModuleRootManager.remove(orderEntry)
-    }
-    newModuleRootManager.appendNode('orderEntry', [type: 'library', scope: 'TEST', name: GRADLE_TEST_LIBRARIES_ID, level: 'project'])
-
-    def writer = new StringWriter()
-    new XmlNodePrinter(new PrintWriter(writer)).print(root)
-    moduleFile.write writer.toString()
-    println "File '${moduleFile.path}' updated"
-}
-*/

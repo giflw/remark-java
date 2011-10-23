@@ -1,0 +1,5 @@
+Division
+
+Struck Through
+
+*Variable*
