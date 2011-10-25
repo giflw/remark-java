@@ -1,11 +1,31 @@
 Term First:
 
-WhazooThis is a thing-a-majigThing-a-majigA whazoo
+Whazoo
+
+This is a thing-a-majig
+
+Thing-a-majig
+
+A whazoo
 
 Definition first:
 
-What am I defining????IDKI don't know...
+What am I defining????
+
+IDK
+
+I don't know...
 
 Multiple definitions:
 
-WhooziwhatA thing-a-majigA whazooThing-a-majigA whazooA whooziwhat
+Whooziwhat
+
+A thing-a-majig
+
+A whazoo
+
+Thing-a-majig
+
+A whazoo
+
+A whooziwhat

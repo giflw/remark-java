@@ -328,7 +328,17 @@ public class DocumentConverter {
 
 				} else {
 					// No-can-do, just remove the node, and keep on walkin'
+					// The only thing we'll do is add block status in if the unknown node
+					// usually renders as a block.
+					// Due to BlockWriter's intelligent tracking, we shouldn't get a whole bunch
+					// of empty lines for empty nodes.
+					if(node.isBlock()) {
+						output.startBlock();
+					}
 					walkNodes(currentNodeHandler, node, nodeList);
+					if(node.isBlock()) {
+						output.endBlock();
+					}					
 				}
 			} // else: not a node we care about (e.g.: comment nodes)
 		}
