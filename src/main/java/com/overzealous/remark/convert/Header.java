@@ -40,7 +40,7 @@ public class Header extends AbstractNodeHandler {
 		out.startBlock();
 		StringUtils.multiply(out, '#', depth);
 		out.print(' ');
-		out.print(converter.getInlineContent(this, node).replace("\n", ""));
+		out.print(converter.getInlineContent(this, node).replace("\n", " "));
 		out.print(' ');
 		StringUtils.multiply(out, '#', depth);
 		if(converter.options.headerIds && node.hasAttr("id")) {
