@@ -39,9 +39,9 @@ public class Anchor extends AbstractNodeHandler {
 	 * @param converter Parent converter for this object.
 	 */
 	public void handleNode(NodeHandler parent, Element node, DocumentConverter converter) {
-		if(node.hasAttr("href")) {
+		if(node.hasAttr("href") && node.attr("href").trim().length() > 0) {
 			// Must be a real link.
-			String url = node.attr("href");
+			String url = converter.cleaner.cleanUrl(node.attr("href"));
 			String label = converter.getInlineContent(this, node);
 
 			if(label.length() > 0) {
@@ -53,7 +53,6 @@ public class Anchor extends AbstractNodeHandler {
 					if(converter.options.fixPegdownStrongEmphasisInLinks) {
 						label = label.replace("***", "**");
 					}
-					url = INLINE_LINK_ESCAPE.matcher(url).replaceAll(INLINE_LINK_REPLACEMENT);
 					converter.output.printf("[%s](%s)", label, url);
 				} else {
 					// standard link
