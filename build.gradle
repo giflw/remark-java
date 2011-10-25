@@ -1,6 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 
+apply plugin: com.smokejumperit.gradle.OneJarPlugin
+
 //---------------------------------------------------------------------------
 // Base properties
 //---------------------------------------------------------------------------
@@ -11,6 +13,14 @@ sourceCompatibility = 1.5
 //---------------------------------------------------------------------------
 // Dependencies
 //---------------------------------------------------------------------------
+buildscript {
+  repositories {
+    mavenRepo urls:'http://repo.smokejumperit.com'
+  }
+  dependencies {
+    classpath 'com.smokejumperit:gradle-plugins:0.8.2'
+  }
+}
 
 repositories {
     mavenCentral()
