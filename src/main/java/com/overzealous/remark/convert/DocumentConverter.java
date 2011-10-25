@@ -117,26 +117,32 @@ public class DocumentConverter {
 		} // else, it's being added directly
 	}
 
+	@SuppressWarnings({"UnusedDeclaration"})
 	public Options getOptions() {
 		return options;
 	}
 
+	@SuppressWarnings({"UnusedDeclaration"})
 	public TextCleaner getCleaner() {
 		return cleaner;
 	}
 
+	@SuppressWarnings({"UnusedDeclaration"})
 	public Map<String, NodeHandler> getBlockNodes() {
 		return Collections.unmodifiableMap(blockNodes);
 	}
 
+	@SuppressWarnings({"UnusedDeclaration"})
 	public Map<String, NodeHandler> getInlineNodes() {
 		return Collections.unmodifiableMap(inlineNodes);
 	}
 
+	@SuppressWarnings({"UnusedDeclaration"})
 	public BlockWriter getOutput() {
 		return output;
 	}
 
+	@SuppressWarnings({"UnusedDeclaration"})
 	public void setOutput(BlockWriter output) {
 		this.output = output;
 	}
@@ -300,6 +306,7 @@ public class DocumentConverter {
 	 * @param nodeList The list of valid nodes at this level.  Should be one of <b>blockNodes</b> or <b>inlineNodes</b>
 	 */
 	public void walkNodes(NodeHandler currentNodeHandler, Element el, Map<String, NodeHandler> nodeList) {
+		Map<String, NodeHandler> backupLastNodeset = lastNodeset;
 		lastNodeset = nodeList;
 		for(final Node n : el.childNodes()) {
 			if(n instanceof TextNode) {
@@ -321,10 +328,21 @@ public class DocumentConverter {
 
 				} else {
 					// No-can-do, just remove the node, and keep on walkin'
+					// The only thing we'll do is add block status in if the unknown node
+					// usually renders as a block.
+					// Due to BlockWriter's intelligent tracking, we shouldn't get a whole bunch
+					// of empty lines for empty nodes.
+					if(node.isBlock()) {
+						output.startBlock();
+					}
 					walkNodes(currentNodeHandler, node, nodeList);
+					if(node.isBlock()) {
+						output.endBlock();
+					}					
 				}
 			} // else: not a node we care about (e.g.: comment nodes)
 		}
+		lastNodeset = backupLastNodeset;
 	}
 
 	/**

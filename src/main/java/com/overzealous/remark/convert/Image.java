@@ -33,7 +33,7 @@ public class Image extends AbstractNodeHandler {
 	 * @param converter Parent converter for this object.
 	 */
 	public void handleNode(NodeHandler parent, Element node, DocumentConverter converter) {
-		String url = node.attr("src");
+		String url = converter.cleaner.cleanUrl(node.attr("src"));
 		String alt = node.attr("alt");
 		if(alt == null || alt.trim().length() == 0) {
 			alt = node.attr("title");
@@ -46,7 +46,6 @@ public class Image extends AbstractNodeHandler {
 			if(alt.length() == 0) {
 				alt = "Image";
 			}
-			url = converter.cleaner.clean(url);
 			converter.output.printf("![%s](%s)", alt, url);
 		} else {
 			String linkId = converter.addLink(url, alt, true);

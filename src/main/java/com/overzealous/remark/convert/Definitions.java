@@ -76,7 +76,7 @@ public class Definitions extends AbstractNodeHandler {
 				// Is this necessary?  We only allow inline, and inline is always one line, so padding is redundant.
 				// Of course, we may want to offer wrapped blocks later, when hardwraps are turned off.
 				converter.output = new BlockWriter(parentWriter).setPrependNewlineString("    ", true);
-				converter.walkNodes(this, child, converter.inlineNodes);
+				converter.walkNodes(this, child, converter.blockNodes);
 				converter.output = parentWriter;
 				
 				lastNodeWasDD = true;

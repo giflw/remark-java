@@ -31,6 +31,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class BlockWriter extends PrintWriter {
 
 	private int blockDepth = 0;
+	
+	private int lastWrittenBlockDepth = -1;
 
 	private boolean autoStartedBlock = false;
 
@@ -215,6 +217,18 @@ public final class BlockWriter extends PrintWriter {
 			// keep track of automatically started blocks.  See startBlock below.
 			autoStartedBlock = true;
 		}
+		if(lastWrittenBlockDepth != blockDepth) {
+			// only print newlines if there is content
+			if(empty) {
+				// if this is the first block printed, then don't actually do anything.
+				empty = false;
+			} else {
+				// otherwise, print two lines, so an empty line occurs between the blocks
+				println();
+				println();
+			}
+			lastWrittenBlockDepth = blockDepth;
+		}
 	}
 
 	/**
@@ -247,21 +261,12 @@ public final class BlockWriter extends PrintWriter {
 	 */
 	public void startBlock() {
 		if(autoStartedBlock) {
-			// if following an auto-started block, don't increment the block depth
-			// this is because these blocks will never be closed.
+			// if following an auto-started block, close the previous block before continuing
 			autoStartedBlock = false;
-		} else {
-			// otherwise, increment block depth so we can keep track of how far down we've traveled.
-			blockDepth++;
+			endBlock();
 		}
-		if(empty) {
-			// if this is the first block printed, then don't actually do anything.
-			empty = false;
-		} else {
-			// otherwise, print two lines, so an empty line occurs between the blocks
-			println();
-			println();
-		}
+		// increment block depth so we can keep track of how far down we've traveled.
+		blockDepth++;
 	}
 
 	/**
@@ -271,6 +276,7 @@ public final class BlockWriter extends PrintWriter {
 		if(blockDepth > 0) {
 			blockDepth--;
 		}
+		lastWrittenBlockDepth = -1;
 	}
 
 	/**

@@ -141,4 +141,32 @@ public class BlockWriterTest {
 
 		Assert.assertEquals("XXXXabc\nXXXXdef\nXXXX\nXXXXghi\nXXXXjkl", bw.toString());
 	}
+
+	@Test
+	public void testEmptyBlocks() throws Exception {
+		BlockWriter bw = BlockWriter.create();
+		bw.writeBlock("block1");
+		bw.startBlock();
+			bw.startBlock();
+				bw.writeBlock("block2");
+			bw.endBlock();
+		bw.endBlock();
+		
+		Assert.assertEquals("block1\n\nblock2", bw.toString());
+	}
+
+	@Test
+	public void testEmptyAutoBlocks() throws Exception {
+		BlockWriter bw = BlockWriter.create();
+		bw.writeBlock("block1");
+		bw.startBlock();
+			bw.write("inline1");
+			bw.startBlock();
+				bw.writeBlock("block2");
+			bw.endBlock();
+			bw.write("inline2");
+		bw.endBlock();
+		
+		Assert.assertEquals("block1\n\ninline1\n\nblock2\n\ninline2", bw.toString());
+	}
 }

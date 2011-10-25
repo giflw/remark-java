@@ -61,6 +61,8 @@ public class TextCleaner {
 
 	private static final Pattern EMPTY_MATCHER = Pattern.compile("\\s+", Pattern.DOTALL);
 	private static final Pattern LINEBREAK_REMOVER = Pattern.compile("(\\s*\\r?+\\n)+");
+	
+	private static final Pattern URL_CLEANER = Pattern.compile("([\\(\\) ])");
 
 	/**
 	 * Create a new TextCleaner based on the configured options.
@@ -153,7 +155,7 @@ public class TextCleaner {
 
 		// confusingly, this replaces single backslashes with double backslashes.
 		// Man, I miss Groovy's slashy strings in these moments...
-		escapes.add(new Escape("\\\\", "\\\\"));
+		escapes.add(new Escape("\\\\", "\\\\\\\\"));
 
 		// creates an set of characters that are universally escaped.
 		// these characters are wrapped in \Q...\E to ensure they aren't treated as special characters.
@@ -301,9 +303,33 @@ public class TextCleaner {
 		return output;
 	}
 
+	/**
+	 * Removes the escaping on leading characters, for example, when they are going to be rendered inside
+	 * another node, such as a table.
+	 * @param input String to process
+	 * @return Cleaned string.
+	 */
 	public String unescapeLeadingCharacters(String input) {
 		// removes any leading escapes...
 		return unescapeLeadingChars.matcher(input).replaceAll("$1$2");
+	}
+
+	/**
+	 * Handles escaping special characters in URLs to avoid issues when they are rendered out
+	 * (ie: spaces, parentheses)
+	 * @param input URL to process
+	 * @return Cleaned URL
+	 */
+	public String cleanUrl(String input) {
+		StringBuffer output = new StringBuffer();
+
+		Matcher m = URL_CLEANER.matcher(input);
+		while (m.find()) {
+			char c = m.group().charAt(0);
+			m.appendReplacement(output, String.format("%%%02x", (int)c));
+		}
+		m.appendTail(output);
+		return output.toString();
 	}
 
 	String getDelimiter(String input) {
