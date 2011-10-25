@@ -33,6 +33,7 @@ public class MarkdownTableCell {
 	/**
 	 * Creates a new, empty MarkdownTableCell
 	 */
+	@SuppressWarnings({"UnusedDeclaration"})
 	public MarkdownTableCell() {
 		this("", MarkdownTable.Alignment.LEFT, 1);
 	}
@@ -109,7 +110,7 @@ public class MarkdownTableCell {
 			contents = "";
 		}
 		// We don't allow linebreaks in a table cell
-		this.contents = contents.replaceAll("[\n]", " ");
+		this.contents = contents.replace("\n", " ");
 	}
 
 	public int getColspan() {
