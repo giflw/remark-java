@@ -114,10 +114,10 @@ public class Main {
 				result = null;
 			} else {
 				checkType(cl, result, error);
-				checkOutput(cl, result, error);
 				checkTimeout(cl, result, error);
 				checkBaseURL(cl, result, error);
 				checkCharset(cl, result, error);
+				checkOutput(cl, result, error);
 				checkInput(cl, result, error);
 			}
 		} catch(ParseException ex) {
@@ -128,12 +128,7 @@ public class Main {
 		}
 		
 		if(!error.isEmpty()) {
-			System.err.println("Error in your options:");
-			for(final String err : error) {
-				System.err.print(" - ");
-				System.err.println(err);
-			}
-			System.err.println();
+			printErrors(error);
 			result = null;
 		}
 		
@@ -146,14 +141,29 @@ public class Main {
 		System.err.println();
 	}
 	
+	private void printErrors(List<String> error) {
+		if(error.size() == 1) {
+			System.err.print("Error: ");
+			System.err.println(error.get(0));
+		} else {
+			System.err.println("Error:");
+			for(final String err : error) {
+				System.err.print(" - ");
+				System.err.println(err);
+			}
+		}
+		System.err.println("Run with the argument -h for help.");
+		System.err.println();
+	}
+	
 	private org.apache.commons.cli.Options makeOptions() {
 		org.apache.commons.cli.Options opts = new org.apache.commons.cli.Options();
 		opts.addOption("t", "type", true, "Type of markdown to target: markdown, markdownextra, multimarkdown, pegdown, pegdownall, or github");
 		opts.addOption("o", "output", true, "Name of file to output to; defaults to system out");
-		opts.addOption("timeout", true, "Timeout in seconds for downloading from URLs only");
-		opts.addOption("baseurl", true, "Base URL for file inputs");
-		opts.addOption("charset", true, "Character set for file inputs");
-		opts.addOption("h", "help", false, "Displays the command line help");
+		opts.addOption("timeout", true, "Timeout in seconds for downloading from URLs only; defaults to 15s");
+		opts.addOption("baseurl", true, "Base URL for file inputs, this helps in handling relative links.");
+		opts.addOption("charset", true, "Character set for file inputs; defaults to UTF-8.");
+		opts.addOption("h", "help", false, "Displays this help.");
 		return opts;
 	}
 	
@@ -255,10 +265,14 @@ public class Main {
 				}
 			} else {
 				File input = new File(arg);
-				if(input.isFile() && input.canRead()) {
-					result.fileInput = input;
+				if(input.isFile()) {
+					if(input.canRead()) {
+						result.fileInput = input;
+					} else {
+						error.add(String.format("Unable to read input file: %s", arg));
+					}
 				} else {
-					error.add("Unable to read input file.");
+					error.add(String.format("Input file does not exist or is not a file: %s", arg));
 				}
 			}
 		}
