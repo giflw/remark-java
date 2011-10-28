@@ -8,18 +8,21 @@ apply plugin: com.smokejumperit.gradle.OneJarPlugin
 //---------------------------------------------------------------------------
 
 description = 'The OverZealous Creations Remark library.'
+targetCompatibility = 1.5
 sourceCompatibility = 1.5
 
 //---------------------------------------------------------------------------
 // Dependencies
 //---------------------------------------------------------------------------
 buildscript {
-  repositories {
-    mavenRepo urls:'http://repo.smokejumperit.com'
-  }
-  dependencies {
-    classpath 'com.smokejumperit:gradle-plugins:0.8.2'
-  }
+	repositories {
+		mavenCentral()
+		mavenRepo urls:'http://repo.smokejumperit.com'
+	}
+	dependencies {
+		classpath group: 'com.smokejumperit', name: 'gradle-plugins', version: '0.8.2'
+		classpath group: 'org.pegdown', name: 'pegdown', version: '1.+'
+	}
 }
 
 repositories {
@@ -57,16 +60,58 @@ javadoc {
 // Custom tasks
 //---------------------------------------------------------------------------
 
-task runRemark(dependsOn: 'classes', description: "Runs the command-line Remark class") << {
-	def exit = javaexec{
-		main = 'com.overzealous.remark.Main'
-		classpath = sourceSets.main.runtimeClasspath
-		//args ''
-		//systemProperty 'simple.message', 'Hello '
-	}
-	if(exit.exitValue != 0) {
-		//println exit
-		println "exit value: ${exit.exitValue}"
+task copyManualFiles(type: Copy) {
+	from 'src/manual/'
+	into 'build/docs/manual/'
+	include 'css/**'
+	include 'images/**'
+	include 'js/**'
+	include 'favicon.ico'
+	include 'apple-touch*.*'
+}
+
+task createManual(dependsOn: [javadoc, copyManualFiles], description: "Converts the markdown manual to HTML for deployment") {
+	group = 'Documentation'
+	templateFile = file('src/manual/_template.html')
+	srcFiles = files { file('src/manual').listFiles().findAll{ it.name.endsWith('.md') } }
+	destDir = file('build/docs/manual')
+	inputs.files srcFiles, templateFile
+	outputs.dir destDir
+	doLast {
+		String template = file('src/manual/_template.html').text
+		templateMe = { String body, String title = null ->
+			def pageclass = "";
+			if(title == null) {
+				title = 'Remark Manual'
+			} else {
+				pageclass = title.replaceAll(/\W+/, '-').toLowerCase()
+				title = "Remark Manual - $title".toString()
+			}
+			
+			template.replace('${title}', title).replace('${body}', body).replace('${pageclass}', pageclass)
+		}
+		def pd = new org.pegdown.PegDownProcessor(org.pegdown.Extensions.ALL);
+		srcFiles.each{ File mdFile ->
+			String htmlFileName = mdFile.name.replace('.md', '.html')
+			File dest = file(new File(htmlFileName, destDir))
+			if(dest.exists() && (!dest.isFile() || !dest.canWrite())) {
+				throw new Exception("Unable to write to destination: $dest.  Please run gradle clean before continuing")
+			}
+			if(!dest.isFile() || 
+					dest.lastModified() < mdFile.lastModified() ||
+					dest.lastModified() < templateFile.lastModified()) {
+				String input = mdFile.getText('UTF-8')
+				String title = null;
+				if(input.startsWith('#')) {
+					def titleMatch = (input =~ /#++([^\n#]+)/)
+					if(titleMatch.find()) {
+						title = titleMatch[0][1].trim()
+					}
+				}
+				def out = pd.markdownToHtml(input)
+				dest.setText(templateMe(out, title), 'UTF-8')
+			}
+		}
 	}
 }
 
