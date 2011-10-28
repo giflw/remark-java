@@ -2,19 +2,19 @@ Empty Link:
 
 Ignored Link
 
-[Hash Link][link-1]
+[Hash Link][1]
 
-[Relative Path Link][link-2]
+[Relative Path Link][2]
 
-[Full Path Link][link-3]
+[Full Path Link][3]
 
-Test duplicate URLs: [Full Path Link 2][link-3]
+Test duplicate URLs: [Full Path Link 2][3]
 
-Autolink: [http://www.google.com/][link-3]
+Autolink: [http://www.google.com/][3]
 
-[***Over-Styled Link***][link-3]
+[***Over-Styled Link***][3]
 
 
-[link-1]: http://www.example.com/#hash
-[link-2]: http://www.example.com/rel/path
-[link-3]: http://www.google.com/
+[1]: http://www.example.com/#hash
+[2]: http://www.example.com/rel/path
+[3]: http://www.google.com/

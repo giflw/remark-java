@@ -388,7 +388,7 @@ public class DocumentConverter {
 			linkId = linkUrls.get(url);
 		} else {
 			if(options.simpleLinkIds) {
-				linkId = (image ? "img-" : "link-") + String.valueOf(linkUrls.size()+1);
+				linkId = (image ? "image-" : "") + String.valueOf(linkUrls.size()+1);
 			} else {
 				recommendedName = cleanLinkId(url, recommendedName, image);
 				if(linkIds.containsKey(recommendedName)) {
