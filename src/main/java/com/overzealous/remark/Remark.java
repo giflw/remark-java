@@ -60,7 +60,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Remark {
 	private final Cleaner cleaner;
-	@SuppressWarnings({"UnusedDeclaration"})
+	@SuppressWarnings({"FieldCanBeLocal", "UnusedDeclaration"})
 	private final Options options;
 	private final DocumentConverter converter;
 	private final ReentrantLock converterLock = new ReentrantLock();
@@ -338,19 +338,5 @@ public class Remark {
 			converterLock.unlock();
 		}
 		return result;
-	}
-
-	/**
-	 * Safety method to allow re-cleaning of Markdown input to
-	 * prevent unsafe HTML nodes.
-	 * 
-	 * <p><strong>NOT IMPLEMENTED YET</strong></p>
-	 * 
-	 * @param input The Markdown to process
-	 * @param convertKnownTags set to true to clean up and convert known markdown-capable tags, otherwise these are ignored!
-	 * @return Cleaned up markdown based on the general Remark rules.
-	 */
-	public String cleanMarkdown(String input, boolean convertKnownTags) {
-		throw new UnsupportedOperationException("NOT IMPLEMENTED YET");
 	}
 }

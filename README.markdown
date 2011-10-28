@@ -18,7 +18,6 @@
 	 * Mobile devices often not support rich text editing through the web browser.
 	 * So, instead, render a plain text field with the raw markdown text.
 	 * Because markdown is relatively easy to read and edit, the user can make simple changes without struggling with hundreds of messy HTML tags.
-	 * If necessary, **Remark** can be fed this input as well, and strip any HTML tags for security.
 
 ## Advanced Features
 
