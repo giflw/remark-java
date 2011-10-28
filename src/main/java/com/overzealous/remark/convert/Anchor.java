@@ -48,7 +48,7 @@ public class Anchor extends AbstractNodeHandler {
 				if(converter.options.autoLinks && url.equals(label)) {
 					// embed autolink
 					converter.output.write(label);
-				} else if(converter.options.linksInline) {
+				} else if(converter.options.inlineLinks) {
 					// standard link
 					if(converter.options.fixPegdownStrongEmphasisInLinks) {
 						label = label.replace("***", "**");

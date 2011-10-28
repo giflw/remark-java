@@ -28,7 +28,7 @@ public class AnchorInlineTest extends RemarkTester {
 	@Override
 	public Remark setupRemark() {
 		Options opts = Options.markdown();
-		opts.linksInline = true;
+		opts.inlineLinks = true;
 		return new Remark(opts);
 	}
 

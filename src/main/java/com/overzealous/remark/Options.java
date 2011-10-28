@@ -369,7 +369,7 @@ public class Options {
 	 * If true, place the URLs for links inline.
 	 * <p>Otherwise, generate link IDs and place at the end (the default).</p>
 	 */
-	public boolean linksInline = false;
+	public boolean inlineLinks = false;
 
 	/**
 	 * If true, link IDs are simply incremented as they are found.

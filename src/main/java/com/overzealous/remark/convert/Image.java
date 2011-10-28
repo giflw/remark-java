@@ -42,7 +42,7 @@ public class Image extends AbstractNodeHandler {
 			}
 		}
 		alt = converter.cleaner.clean(alt.trim());
-		if(converter.options.linksInline) {
+		if(converter.options.inlineLinks) {
 			if(alt.length() == 0) {
 				alt = "Image";
 			}
