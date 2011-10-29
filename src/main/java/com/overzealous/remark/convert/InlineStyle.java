@@ -21,6 +21,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -36,6 +37,8 @@ public class InlineStyle extends AbstractNodeHandler {
 	private static final Pattern BOLD_PATTERN = Pattern.compile("font-weight:\\s*bold", Pattern.CASE_INSENSITIVE);
 	
 	private static final Pattern INWORD_CHARACTER = Pattern.compile("\\w");
+	
+	private static final Pattern SPACE_CONTENT_SPACE = Pattern.compile("^(\\s*+)(.*?)(\\s*)$", Pattern.DOTALL);
 
 	private int italicDepth = 0;
 	private int boldDepth = 0;
@@ -54,36 +57,110 @@ public class InlineStyle extends AbstractNodeHandler {
 	 * @param converter Parent converter for this object.
 	 */
 	public void handleNode(NodeHandler parent, Element node, DocumentConverter converter) {
-		InWord iw = checkInword(node, converter);
-		if(iw.emphasisPreserved) {
-			Style style = checkTag(node);
-
-			if(style.bold || style.italics) {
-				if(iw.addSpacing) {
-					converter.output.write(' ');
+		if(checkInnerBlock(node)) {
+			// not valid to have an inline node around block nodes, so we have to
+			// simply ignore them.
+			// just recurse like it's not here.
+			converter.walkNodes(parent, node);
+		} else {
+			Rules rules = checkInword(node, converter);
+			if(rules.emphasisPreserved) {
+				checkTag(node, rules);
+	
+				if(rules.bold || rules.italics) {
+					handleStyled(parent, node, converter, rules);
+				} else {
+					converter.walkNodes(this, node, converter.inlineNodes);
 				}
-				start(style, converter);
+			} else { // emphasis has been disabled for this section
+				// mark as if emphasis was already processed
+				italicDepth++;
+				boldDepth++;
 				converter.walkNodes(this, node, converter.inlineNodes);
-				end(style, converter);
-				if(iw.addSpacing) {
-					converter.output.write(' ');
-				}
-			} else {
-				converter.walkNodes(this, node, converter.inlineNodes);
+				italicDepth--;
+				boldDepth--;
 			}
-		} else { // emphasis has been disabled for this section
-			// mark as if emphasis was already processed
-			italicDepth++;
-			boldDepth++;
-			converter.walkNodes(this, node, converter.inlineNodes);
-			italicDepth--;
-			boldDepth--;
 		}
 	}
 
-	private class InWord {
+	@Override
+	public void handleTextNode(TextNode node, DocumentConverter converter) {
+		// Override to provide special handling for ignoring
+		// leading or trailing all-space nodes.
+		if((node.previousSibling() != null && node.nextSibling() != null) ||
+				   node.text().trim().length() != 0) {
+			super.handleTextNode(node, converter);
+		}
+	}
+
+	/**
+	 * Minor class to hold onto the styling rules for this class.
+	 */
+	private class Rules {
 		boolean emphasisPreserved = true;
 		boolean addSpacing = false;
+		boolean italics = false;
+		boolean bold = false;
+	}
+
+	/**
+	 * Handles dealing with a styled node (one that has markers on either side).
+	 * 
+	 * <p>It's unique because we have to deal with leading and trailing spaces, among other issues.</p>
+	 * 
+	 * @param parent The previous node walker, in case we just want to remove an element.
+	 * @param node	  Node to handle
+	 * @param converter Parent converter for this object.
+	 * @param rules The styling rules that are active
+	 */
+	private void handleStyled(NodeHandler parent, Element node, DocumentConverter converter, Rules rules) {
+		// prevent double styling
+		if(rules.bold) { boldDepth++; }
+		if(rules.italics) { italicDepth++; }
+		String content = converter.getInlineContent(this, node, true);
+		if(rules.bold) { boldDepth--; }
+		if(rules.italics) { italicDepth--; }
+		
+		// only proceed if we have content
+		if(content.length() > 0) {
+		
+			
+			Matcher parts = SPACE_CONTENT_SPACE.matcher(content);
+			if(parts.find()) {
+				// write any leading space
+				converter.output.write(parts.group(1));
+				
+				// write leading style marker
+				start(rules, parts.group(1), converter);
+				
+				// write content
+				converter.output.write(parts.group(2));
+				
+				// write trailing marker 
+				end(rules, parts.group(3), converter);
+				
+				// write any trailing space
+				converter.output.write(parts.group(3));
+					
+			} // else, something weird happened, like (1 == 0)
+		}
+	}
+
+	/**
+	 * Check to see if there is a block-level node somewhere inside this node.
+	 * 
+	 * @param node Current node
+	 * @return True is there is a block inside this node (which would be invalid HTML)
+	 */
+	private boolean checkInnerBlock(Element node) {
+		boolean blockExists = false;
+		for(final Element child : node.children()) {
+			blockExists = child.isBlock() || checkInnerBlock(child);
+			if(blockExists) {
+				break;
+			}
+		}
+		return blockExists;
 	}
 
 	/**
@@ -97,8 +174,8 @@ public class InlineStyle extends AbstractNodeHandler {
 	 * @param converter The current converter
 	 * @return flags for checking.
 	 */
-	private InWord checkInword(Element node, DocumentConverter converter) {
-		InWord result = new InWord();
+	private Rules checkInword(Element node, DocumentConverter converter) {
+		Rules result = new Rules();
 		Options.InWordEmphasis iwe = converter.options.getInWordEmphasis();
 		if(!iwe.isEmphasisPreserved() || iwe.isAdditionalSpacingNeeded()) {
 			// peek behind for inline styling
@@ -124,62 +201,78 @@ public class InlineStyle extends AbstractNodeHandler {
 		return result;
 	}
 
-	private class Style {
-		boolean italics = false;
-		boolean bold = false;
-	}
-
-	private Style checkTag(Element node) {
-		Style s = new Style();
-
+	/**
+	 * Check the styling rules that may or may not apply to this tag.
+	 * @param node The node to look at
+	 * @param rules The rules object to hold the result
+	 */
+	private void checkTag(Element node, Rules rules) {
 		String tn = node.tagName();
 		if(tn.equals("i") || tn.equals("em")) {
-			s.italics = (italicDepth == 0);
+			rules.italics = (italicDepth == 0);
 		} else if(tn.equals("b") || tn.equals("strong")) {
-			s.bold = (boldDepth == 0);
+			rules.bold = (boldDepth == 0);
 		} else {
 			// check inline-style
 			if(node.hasAttr("style")) {
 				String style = node.attr("style");
 				if(ITALICS_PATTERN.matcher(style).find()) {
-					s.italics = (italicDepth == 0);
+					rules.italics = (italicDepth == 0);
 				}
 				if(BOLD_PATTERN.matcher(style).find()) {
-					s.bold = (boldDepth == 0);
+					rules.bold = (boldDepth == 0);
 				}
 			}
 		}
-
-		return s;
 	}
 
-	private void start(Style style, DocumentConverter converter) {
+	/**
+	 * Render the starting styling tag as necessary.
+	 * 
+	 * @param style Rules to render
+	 * @param leadingSpaces Leading spaces string (if any)
+	 * @param converter parent converter
+	 */
+	private void start(Rules style, String leadingSpaces, DocumentConverter converter) {
+		if(style.addSpacing &&
+				   (italicDepth == 0 || boldDepth == 0) &&
+				   (leadingSpaces == null || leadingSpaces.length() == 0)) {
+			converter.output.write(' ');
+		}
 		if(style.italics) {
 			if(italicDepth == 0) {
 				converter.output.write(ITALICS_WRAPPER);
 			}
-			italicDepth++;
 		}
 		if(style.bold) {
 			if(boldDepth == 0) {
 				converter.output.write(BOLD_WRAPPER);
 			}
-			boldDepth++;
 		}
 	}
 
-	private void end(Style style, DocumentConverter converter) {
+	/**
+	 * Render the ending tag as necessary.
+	 * 
+	 * @param style Rules to render
+	 * @param trailingSpaces Trailing spaces (if any)
+	 * @param converter parent converter
+	 */
+	private void end(Rules style, String trailingSpaces, DocumentConverter converter) {
 		if(style.bold) {
-			boldDepth--;
 			if(boldDepth == 0) {
 				converter.output.write(BOLD_WRAPPER);
 			}
 		}
 		if(style.italics) {
-			italicDepth--;
 			if(italicDepth == 0) {
 				converter.output.write(ITALICS_WRAPPER);
 			}
+		}
+		if(style.addSpacing &&
+					(italicDepth == 0 || boldDepth == 0) &&
+					(trailingSpaces == null || trailingSpaces.length() == 0)) {
+			converter.output.write(' ');
 		}
 	}
 }
