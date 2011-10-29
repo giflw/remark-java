@@ -38,6 +38,7 @@ public class Main {
 		String baseURL = "";
 		String charset = null;
 		File output = null;
+		boolean html = false;
 		Options options = null;
 	}
 	
@@ -49,37 +50,9 @@ public class Main {
 		Args myArgs = processArgs(args);
 		if(myArgs != null) {
 			Remark remark = new Remark(myArgs.options);
+			remark.setCleanedHtmlEchoed(myArgs.html);
 			if(myArgs.output != null) {
-				FileOutputStream fos = null;
-				OutputStreamWriter osw = null;
-				BufferedWriter bw = null;
-				try {
-					fos = new FileOutputStream(myArgs.output);
-					//noinspection IOResourceOpenedButNotSafelyClosed
-					osw = new OutputStreamWriter(fos, "UTF-8");
-					//noinspection IOResourceOpenedButNotSafelyClosed
-					bw = new BufferedWriter(osw);
-					remark = remark.withWriter(bw);
-					convert(remark, myArgs);
-					
-				} catch(IOException ex) {
-					System.err.println("Error reading from input or writing to output file:");
-					System.err.println("  " + ex.getMessage());
-				} finally {
-					try {
-						if(bw != null) {
-							bw.close();
-						}
-						if(osw != null) {
-							osw.close();
-						}
-						if(fos != null) {
-							fos.close();
-						}
-					} catch(IOException ex) {
-						ex.printStackTrace();
-					}
-				}
+				convertToFile(remark, myArgs);
 			} else {
 				try {
 					System.out.println(convert(remark, myArgs));
@@ -87,6 +60,33 @@ public class Main {
 					System.err.println("Error reading from input:");
 					System.err.println("  " + ex.getMessage());
 				}
+			}
+		}
+	}
+	
+	private void convertToFile(Remark remark, Args myArgs) {
+		FileOutputStream fos = null;
+		OutputStreamWriter osw = null;
+		BufferedWriter bw = null;
+		try {
+			fos = new FileOutputStream(myArgs.output);
+			//noinspection IOResourceOpenedButNotSafelyClosed
+			osw = new OutputStreamWriter(fos, "UTF-8");
+			//noinspection IOResourceOpenedButNotSafelyClosed
+			bw = new BufferedWriter(osw);
+			remark = remark.withWriter(bw);
+			convert(remark, myArgs);
+			
+		} catch(IOException ex) {
+			System.err.println("Error reading from input or writing to output file:");
+			System.err.println("  " + ex.getMessage());
+		} finally {
+			try {
+				if(bw != null) { bw.close(); }
+				if(osw != null) { osw.close(); }
+				if(fos != null) { fos.close(); }
+			} catch(IOException ex) {
+				ex.printStackTrace();
 			}
 		}
 	}
@@ -119,6 +119,7 @@ public class Main {
 				checkCharset(cl, result, error);
 				checkOutput(cl, result, error);
 				checkInput(cl, result, error);
+				result.html = cl.hasOption("html");
 			}
 		} catch(ParseException ex) {
 			System.err.println("Unexpected error parsing the command line.");
@@ -163,6 +164,7 @@ public class Main {
 		opts.addOption("timeout", true, "Timeout in seconds for downloading from URLs only; defaults to 15s");
 		opts.addOption("baseurl", true, "Base URL for file inputs, this helps in handling relative links.");
 		opts.addOption("charset", true, "Character set for file inputs; defaults to UTF-8.");
+		opts.addOption("html", false, "If set, the cleaned HTML document will be echoed out before conversion.");
 		opts.addOption("h", "help", false, "Displays this help.");
 		return opts;
 	}

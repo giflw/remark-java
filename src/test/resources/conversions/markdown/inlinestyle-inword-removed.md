@@ -14,4 +14,6 @@
 
 **nested**
 
+Empty, *leading*, inline and trailing spaces.
+
 InWordStyle - InWordStyle - InWordStyle
