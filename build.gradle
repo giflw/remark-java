@@ -76,19 +76,23 @@ task createManual(dependsOn: [javadoc, copyManualFiles], description: "Converts 
 	srcFiles = files { file('src/manual').listFiles().findAll{ it.name.endsWith('.md') } }
 	destDir = file('build/docs/manual')
 	inputs.files srcFiles, templateFile
-	outputs.dir destDir
+	//outputs.dir destDir
 	doLast {
 		String template = file('src/manual/_template.html').text
-		templateMe = { String body, String title = null ->
-			def pageclass = "";
-			if(title == null) {
-				title = 'Remark Manual'
-			} else {
-				pageclass = title.replaceAll(/\W+/, '-').toLowerCase()
-				title = "Remark Manual - $title".toString()
+		def keyword = ~/\$\{([\-a-z]+)\}/
+		templateMe = { String filename, String body, String title = null ->
+			def props = [
+				title: 'Remark Manual',
+				body: body,
+				pageclass: filename
+			]
+			if(title != null) {
+				props.title = "${props.title} - $title".toString()
 			}
 			
-			template.replace('${title}', title).replace('${body}', body).replace('${pageclass}', pageclass)
+			template.replaceAll(keyword) { m, kw ->
+				props[kw] ?: (filename == kw ? ' selected' : '')
+			}
 		}
 		def pd = new org.pegdown.PegDownProcessor(org.pegdown.Extensions.ALL);
 		srcFiles.each{ File mdFile ->
@@ -109,7 +113,7 @@ task createManual(dependsOn: [javadoc, copyManualFiles], description: "Converts 
 					}
 				}
 				def out = pd.markdownToHtml(input)
-				dest.setText(templateMe(out, title), 'UTF-8')
+				dest.setText(templateMe(mdFile.name.replace('.md', ''), out, title), 'UTF-8')
 			}
 		}
 	}

@@ -110,7 +110,7 @@ a {
     padding: 0;
     vertical-align: baseline;
 }
-a:hover {
+a:hover, a:active {
     text-decoration: none;
     color: #2471a1;
 }
@@ -125,7 +125,7 @@ a:visited {
 pre {
     padding: 0 24px;
     max-width: 692px;
-    white-space: pre-wrap;
+    white-space: pre;
 }
 code {
 	border: 1px solid #DDD;
@@ -143,6 +143,7 @@ pre code {
 	padding: .25em .7em;
 	max-height: 275px;
 	overflow: auto;
+	-webkit-overflow-scrolling: touch;
 }
 
 
@@ -250,6 +251,7 @@ nav li {
 	font-family: Century Gothic, Apple Gothic, sans-serif;
 	border-right: 1px solid #333;
 }
+
 nav a:link, nav a:visited {
 	display: block;
 	color: #ddd;
@@ -275,17 +277,13 @@ nav a:active {
 	box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 }
 
-.introduction nav .home,
-.examples nav .examples,
-.license nav .license {
+nav .selected {
 	position: relative;
 	-moz-box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
 	-webkit-box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
 	box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
 }
-.introduction nav .home:after,
-.examples nav .examples:after,
-.license nav .license:after {
+nav .selected:after {
 	display: block;
 	content: '.';
 	text-indent: -9999px;
@@ -297,6 +295,16 @@ nav a:active {
 	height: 8px;
 	left: 50%;
 	margin-left: -8px;
+}
+@media only screen and (max-device-width: 1024px) {
+	/* make the links a little easier to hit */
+	nav li {
+		font-size: 13px;
+		line-height: 24px;
+	}
+	nav .selected:after {
+		top: 34px;
+	}
 }
 
 #content {
@@ -339,7 +347,6 @@ nav a:active {
 .examples #content ul li pre {
 	width: auto;
     padding: 0 12px 0 0;
-	white-space: pre;
 	margin: 0 0 24px;
 }
 .examples #content ul li:nth-child(2) pre {
@@ -347,6 +354,16 @@ nav a:active {
 }
 .examples #content ul li pre code {
 	line-height: 1.3;
+}
+
+@media only screen and (max-device-width: 320px) and (orientation: portrait) {
+	.examples #content ul li {
+		float: none;
+		width: auto;
+	}
+	.examples #content ul li:nth-child(2) pre {
+		padding: 0 12px 0 0;
+	}
 }
 
 footer {
