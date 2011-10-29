@@ -70,7 +70,8 @@ task copyManualFiles(type: Copy) {
 	include 'apple-touch*.*'
 }
 
-task createManual(dependsOn: [javadoc, copyManualFiles], description: "Converts the markdown manual to HTML for deployment") {
+//task createManual(dependsOn: [javadoc, copyManualFiles], description: "Converts the markdown manual to HTML for deployment") {
+task createManual(dependsOn: [copyManualFiles], description: "Converts the markdown manual to HTML for deployment") {
 	group = 'Documentation'
 	templateFile = file('src/manual/_template.html')
 	srcFiles = files { file('src/manual').listFiles().findAll{ it.name.endsWith('.md') } }
