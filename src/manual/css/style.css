@@ -307,8 +307,8 @@ nav a:active {
     line-height: 1;
     padding: 30px;
 }
-#content *,
-footer * {
+#content > *,
+footer > * {
     max-width: 800px;
 	min-width: 600px;
 }
