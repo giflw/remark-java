@@ -64,6 +64,7 @@ public class Remark {
 	private final Options options;
 	private final DocumentConverter converter;
 	private final ReentrantLock converterLock = new ReentrantLock();
+	private boolean cleanedHtmlEchoed = false;
 
 	/**
 	 * Creates a default, pure Markdown-compatible Remark instance.
@@ -80,7 +81,8 @@ public class Remark {
 	public Remark(Options options) {
 		this.options = options;
 		Whitelist whitelist = Whitelist.basicWithImages()
-									  .addTags("h1", "h2", "h3", "h4", "h5", "h6",
+									  .addTags(	      "div",
+													  "h1", "h2", "h3", "h4", "h5", "h6",
 													  "table", "tbody", "td", "tfoot", "th", "thead", "tr",
 													  "hr",
 													  "span", "font")
@@ -115,8 +117,27 @@ public class Remark {
 	 *
 	 * @return the configured DocumentConverter.
 	 */
+	@SuppressWarnings({"UnusedDeclaration"})
 	public DocumentConverter getConverter() {
 		return converter;
+	}
+
+	/**
+	 * Returns true if the cleaned HTML document is echoed to {@code System.out}.
+	 * @return true if the cleaned HTML document is echoed 
+	 */
+	@SuppressWarnings({"UnusedDeclaration"})
+	public boolean isCleanedHtmlEchoed() {
+		return cleanedHtmlEchoed;
+	}
+
+	/**
+	 * To see the cleaned and processed HTML document, set this to true.  It will
+	 * be rendered to {@code System.out} for debugging purposes.
+	 * @param cleanedHtmlEchoed true to echo out the cleaned HTML document
+	 */
+	public void setCleanedHtmlEchoed(boolean cleanedHtmlEchoed) {
+		this.cleanedHtmlEchoed = cleanedHtmlEchoed;
 	}
 
 	/**
@@ -286,6 +307,7 @@ public class Remark {
 	 * @return Markdown text.
 	 * @see org.jsoup.Jsoup#parseBodyFragment(String, String)
 	 */
+	@SuppressWarnings({"UnusedDeclaration"})
 	public String convertFragment(String body) {
 		return convertFragment(body, "");
 	}
@@ -324,6 +346,11 @@ public class Remark {
 	 */
 	private String processConvert(Document doc, Writer writer, OutputStream os) {
 		doc = cleaner.clean(doc);
+		if(cleanedHtmlEchoed) {
+			System.out.println("Cleaned and processed HTML document:");
+			System.out.println(doc.toString());
+			System.out.println();
+		}
 		String result = null;
 		converterLock.lock();
 		try {
