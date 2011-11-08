@@ -525,4 +525,40 @@ public class Options {
 		return inWordEmphasis;
 	}
 
+	/**
+	 * Utility method to set reversing of both unicode and html
+	 * smart quotes.
+	 * 
+	 * @param reverse true if they should be reversed
+	 */
+	public void setReverseSmartQuotes(boolean reverse) {
+		this.reverseHtmlSmartQuotes = reverse;
+		this.reverseUnicodeSmartQuotes = reverse;
+	}
+	
+
+	/**
+	 * Utility method to set reversing of both unicode and html
+	 * smart punctuation.
+	 * 
+	 * @param reverse true if they should be reversed
+	 */
+	public void setReverseSmartPunctuation(boolean reverse) {
+		this.reverseHtmlSmartPunctuation = reverse;
+		this.reverseUnicodeSmartPunctuation = reverse;
+	}
+	
+
+	/**
+	 * Utility method to set reversing of both unicode and html
+	 * smart quotes and punctuation.
+	 * 
+	 * @param reverse true if they should be reversed
+	 */
+	@SuppressWarnings({"UnusedDeclaration"})
+	public void setReverseAllSmarts(boolean reverse) {
+		setReverseSmartQuotes(reverse);
+		setReverseSmartPunctuation(reverse);
+	}
+
 }
