@@ -90,12 +90,12 @@ public class DocumentConverter {
 		addInlineNode(new Image(),			"img");
 		addInlineNode(new Anchor(),			"a");
 		addInlineNode(new Break(),			"br");
-		addBlockNode(new Header(),			"h1,h2,h3,h4,h5,h6");
+		addBlockNode (new Header(),			"h1,h2,h3,h4,h5,h6");
 		addBlockNode (new Paragraph(),		"p");
 		addBlockNode (new Codeblock(),		"pre");
 		addBlockNode (new BlockQuote(),		"blockquote");
 		addBlockNode (new HorizontalRule(),	"hr");
-		addBlockNode(new List(),			"ol,ul");
+		addBlockNode (new List(),			"ol,ul");
 
 		if(options.abbreviations) {
 			addInlineNode(new Abbr(),		"abbr,acronym");
