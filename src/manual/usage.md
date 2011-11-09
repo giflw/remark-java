@@ -58,7 +58,7 @@ For more information on what these static option sets provide, please check out 
 
 You can also set up your own options, to change the behavior for certain features.  The following is just a highlight.  The [JavaDoc API for `Options`][javadoc Options] has the complete list of settings.
 
-> Note: all options must be configured **before** creating the Remark object.  Once the remark object is created, the Options object should no longer be modified.
+> Note: all options must be configured **before** creating the Remark object.  However, the Options object is cloned when creating the Remark instance, so you can reuse the Options object to create different Remark instances.
 
 ### Replace Tables with plain text 
 

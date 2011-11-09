@@ -34,7 +34,7 @@ import java.util.Set;
  *
  * @author Phil DeJarnett
  */
-public class Options {
+public class Options implements Cloneable {
 
 	/**
 	 * Provides settings to control how Tables are converted.
@@ -353,7 +353,7 @@ public class Options {
 		opts.tables = Tables.CONVERT_TO_CODE_BLOCK;
 		return opts;
 	}
-
+	
 	/**
 	 * If true, {@code <br/>}s are replaced with a simple linebreak.
 	 * <p>If false, {@code <br/>}s are replaced with a two spaces followed by a linebreak (default).</p>
@@ -560,5 +560,14 @@ public class Options {
 		setReverseSmartQuotes(reverse);
 		setReverseSmartPunctuation(reverse);
 	}
-
+	
+	public Options getCopy() {
+		Options copy;
+		try {
+			copy = (Options)this.clone();
+		} catch(CloneNotSupportedException e) {
+			throw new RuntimeException("Should never happen");
+		}
+		return copy;
+	}
 }

@@ -47,7 +47,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Remark remark = new Remark();
  * String cleanedUp = remark.convertFragment(inputString);
  * 
- * // Create a generic remark that converts 
+ * // Create a remark that converts to pegdown with all extensions enabled. 
  * Remark pegdownAll = new Remark(Options.pegdownAllExtensions());
  * cleanedUp = pegdownAll.convert(new URL("http://www.example.com"), 15000);
  * 
@@ -79,7 +79,7 @@ public class Remark {
 	 * @param options Specified options to use on this instance.  See the docs for the Options class for common options sets.
 	 */
 	public Remark(Options options) {
-		this.options = options;
+		this.options = options.getCopy();
 		Whitelist whitelist = Whitelist.basicWithImages()
 									  .addTags(	      "div",
 													  "h1", "h2", "h3", "h4", "h5", "h6",
