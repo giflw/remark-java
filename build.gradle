@@ -118,6 +118,15 @@ task createManual(dependsOn: [javadoc, copyManualFiles], description: "Converts 
 		}
 	}
 }
+task buildDist(dependsOn: [build, createManual, oneJar], description: "Builds everything.") {
+	group = 'Distribution'
+}
+if(gradle.startParameter.taskNames.any{ it == 'cleanBuildDist' || it == 'cBD' }) {
+	compileJava.dependsOn clean
+}
+task cleanBuildDist(dependsOn: [buildDist], description: "Cleans and builds everything.") {
+	group = 'Distribution'
+}
 
 task bumpVersion(description: 'Bumps the app Version for release.') << {
 	//noinspection GroovyAssignabilityCheck
