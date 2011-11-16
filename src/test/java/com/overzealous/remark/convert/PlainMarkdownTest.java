@@ -23,21 +23,22 @@ import org.junit.Test;
  */
 public class PlainMarkdownTest extends RemarkTester {
 
-	@Test public void testAbbr()			throws Exception { test("abbr"); }
-	@Test public void testAnchor()			throws Exception { test("anchor"); }
-	@Test public void testBlockQuote()		throws Exception { test("blockquote"); }
-	@Test public void testHeader()			throws Exception { test("header"); }
-	@Test public void testBreak()			throws Exception { test("break"); }
-	@Test public void testCodeblock()		throws Exception { test("codeblock"); }
-	@Test public void testDefinitions()		throws Exception { test("definitions"); }
-	@Test public void testHorizontalRule()	throws Exception { test("horizontalrule"); }
-	@Test public void testImage()			throws Exception { test("image"); }
-	@Test public void testInlineCode()		throws Exception { test("inlinecode"); }
-	@Test public void testInlineStyle()		throws Exception { test("inlinestyle"); }
-	@Test public void testListOrdered()		throws Exception { test("listordered"); }
-	@Test public void testListUnordered()	throws Exception { test("listunordered"); }
-	@Test public void testParagraph()		throws Exception { test("paragraph"); }
-	@Test public void testTables()			throws Exception { test("tables"); }
-	@Test public void testUnknownHTML()		throws Exception { test("unknownHTML"); }
+	@Test public void testAbbr()					throws Exception { test("abbr"); }
+	@Test public void testAnchor()					throws Exception { test("anchor"); }
+	@Test public void testBlockQuote()				throws Exception { test("blockquote"); }
+	@Test public void testHeader()					throws Exception { test("header"); }
+	@Test public void testBreak()					throws Exception { test("break"); }
+	@Test public void testCodeblock()				throws Exception { test("codeblock"); }
+	@Test public void testDefinitions()				throws Exception { test("definitions"); }
+	@Test public void testHorizontalRule()			throws Exception { test("horizontalrule"); }
+	@Test public void testImage()					throws Exception { test("image"); }
+	@Test public void testInlineCode()				throws Exception { test("inlinecode"); }
+	@Test public void testInlineStyle()				throws Exception { test("inlinestyle"); }
+	@Test public void testInlineStyleEmptyBreak()	throws Exception { test("inlinestyle-emptybreak"); }
+	@Test public void testListOrdered()				throws Exception { test("listordered"); }
+	@Test public void testListUnordered()			throws Exception { test("listunordered"); }
+	@Test public void testParagraph()				throws Exception { test("paragraph"); }
+	@Test public void testTables()					throws Exception { test("tables"); }
+	@Test public void testUnknownHTML()				throws Exception { test("unknownHTML"); }
 	
 }

@@ -130,14 +130,17 @@ public class InlineStyle extends AbstractNodeHandler {
 				// write any leading space
 				converter.output.write(parts.group(1));
 				
-				// write leading style marker
-				start(rules, parts.group(1), converter);
-				
-				// write content
-				converter.output.write(parts.group(2));
-				
-				// write trailing marker 
-				end(rules, parts.group(3), converter);
+				// don't write the markers if the content ends up empty
+				if(parts.group(2).length() > 0) {
+					// write leading style marker
+					start(rules, parts.group(1), converter);
+					
+					// write content
+					converter.output.write(parts.group(2));
+					
+					// write trailing marker 
+					end(rules, parts.group(3), converter);
+				}
 				
 				// write any trailing space
 				converter.output.write(parts.group(3));
