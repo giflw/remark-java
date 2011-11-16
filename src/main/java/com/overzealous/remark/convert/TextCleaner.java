@@ -215,7 +215,11 @@ public class TextCleaner {
 		if(oinput instanceof TextNode) {
 			input = getTextNodeText((TextNode)oinput, normalText);
 		} else if(oinput instanceof Element) {
-			input = ((Element)oinput).text();
+			if(normalText) {
+				input = ((Element)oinput).text();
+			} else {
+				input = getPreformattedText((Element)oinput);
+			}
 		} else {
 			input = oinput.toString();
 		}
@@ -245,6 +249,32 @@ public class TextCleaner {
 			result = StringEscapeUtils.unescapeHtml4(input.replace("&apos;", "'"));
 		}
 		return result;
+	}
+
+	/**
+	 * Replaces all {@code <br/>} tags with a newline in a copy of the input node, and
+	 * returns the resulting innter text.
+	 * This is necessary to ensure that manual linebreaks are supported in preformatted code.
+	 * 
+	 * @param oinput Preformatted node to process
+	 * @return inner text of the node.
+	 */
+	private String getPreformattedText(Element oinput) {
+		Element el = oinput.clone();
+		fixLineBreaks(el);
+		return el.text();
+	}
+	
+	// recursively processes the element to replace <br>'s with \n
+	private void fixLineBreaks(Element el) {
+		for(final Element e : el.children()) {
+			if(e.tagName().equals("br")) {
+				e.before("\n");
+				e.remove();
+			} else {
+				fixLineBreaks(e);
+			}
+		}
 	}
 
 	/**
