@@ -7,7 +7,6 @@ apply plugin: com.smokejumperit.gradle.OneJarPlugin
 // Base properties
 //---------------------------------------------------------------------------
 
-description = 'The OverZealous Creations Remark library.'
 targetCompatibility = 1.5
 sourceCompatibility = 1.5
 
@@ -126,6 +125,36 @@ if(gradle.startParameter.taskNames.any{ it == 'cleanBuildDist' || it == 'cBD' })
 }
 task cleanBuildDist(dependsOn: [buildDist], description: "Cleans and builds everything.") {
 	group = 'Distribution'
+}
+
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			repository(url: "file://localhost/~/mvnTemp")
+			pom.whenConfigured { pomToConfigure ->
+				pomToConfigure.project {
+					description project.description
+					url project.url
+					licenses {
+						license {
+							name project.licenseName
+							url project.licenseUrl
+						}
+					}
+					developers {
+						developer {
+							id "OverZealous"
+							name "Phil DeJarnett"
+							email "phil@overzealous.com"
+						}
+					}
+					scm {
+						url project.scmUrl
+					}
+				}
+			}
+		}
+	}
 }
 
 task bumpVersion(description: 'Bumps the app Version for release.') << {
