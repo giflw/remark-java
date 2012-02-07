@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Non-Resource Files" pattern="(!file:build//*&amp;&amp;!file:.idea//*&amp;&amp;!file:src/test//*||file:src/test//*)&amp;&amp;!file:src/test/resources//*&amp;&amp;!file:Remark.iml&amp;&amp;!file:LICENSE&amp;&amp;!file:.hgignore&amp;&amp;!file:.hgflow&amp;&amp;!file:README.markdown&amp;&amp;!file:.hgtags" />
+</component>
