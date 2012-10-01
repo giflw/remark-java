@@ -59,17 +59,27 @@ javadoc {
 // Custom tasks
 //---------------------------------------------------------------------------
 
+task copyManualHtAccess(type: Copy) {
+	from 'src/manual/'
+	into 'build/docs/'
+    include '.htaccess'
+}
+
 task copyManualFiles(type: Copy) {
 	from 'src/manual/'
 	into 'build/docs/manual/'
-	include 'css/**'
-	include 'images/**'
-	include 'js/**'
-	include 'favicon.ico'
-	include 'apple-touch*.*'
+    exclude '*.md'
+    exclude '*.htaccess'
+    exclude '_template.html'
+	//include 'css/**'
+	//include 'images/**'
+	//include 'js/**'
+    //include '.htaccess'
+	//include 'favicon.ico'
+	//include 'apple-touch*.*'
 }
 
-task createManual(dependsOn: [javadoc, copyManualFiles], description: "Converts the markdown manual to HTML for deployment") {
+task createManual(dependsOn: [javadoc, copyManualHtAccess, copyManualFiles], description: "Converts the markdown manual to HTML for deployment") {
 	group = 'Documentation'
 	templateFile = file('src/manual/_template.html')
 	srcFiles = files { file('src/manual').listFiles().findAll{ it.name.endsWith('.md') } }
