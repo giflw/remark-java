@@ -16,7 +16,7 @@ sourceCompatibility = 1.5
 buildscript {
 	repositories {
 		mavenCentral()
-		mavenRepo urls:'http://repo.smokejumperit.com'
+		mavenRepo url:'http://repo.smokejumperit.com'
 	}
 	dependencies {
 		classpath group: 'com.smokejumperit', name: 'gradle-plugins', version: '0.8.2'
@@ -31,7 +31,7 @@ repositories {
 dependencies {
     compile group: 'org.jsoup', name: 'jsoup', version: '1.6.+'
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.+'
-	compile group: 'commons-cli', name: 'commons-cli', version: '1.+'
+	compile group: 'commons-cli', name: 'commons-cli', version: '1.2'
     testCompile group: 'junit', name: 'junit', version: '4.+'
 	testCompile group: 'commons-io', name: 'commons-io', version: '2.+'
 }
