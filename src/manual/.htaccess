@@ -1,1 +1,2 @@
-RedirectMatch /$ http://remark.overzealous.com/manual/index.html
+RedirectMatch ^/manual$ http://remark.overzealous.com/manual/index.html
+RedirectMatch ^/$ http://remark.overzealous.com/manual/index.html
