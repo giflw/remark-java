@@ -365,6 +365,12 @@ public class Options implements Cloneable {
 	 */
 	public InWordEmphasis inWordEmphasis = InWordEmphasis.NORMAL;
 
+    /**
+     * If true, relative links are preserved. <strong>You must still provide a baseURI!</strong>
+     * <p>Otherwise, relative links are resolved against the provided baseURI (the default).</p>
+     */
+    public boolean preserveRelativeLinks = false;
+    
 	/**
 	 * If true, place the URLs for links inline.
 	 * <p>Otherwise, generate link IDs and place at the end (the default).</p>

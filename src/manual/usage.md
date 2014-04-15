@@ -31,6 +31,8 @@ Because Remark uses [jsoup][] under the surface, it can parse HTML from a variet
 *   Convert fragments with a base URI to allow for relative links
 
         remark.convertFragment(htmlInput, "http://www.example.com");
+        
+    **Note:** Relative links will be *removed* from the final document if you do not provide a base URI on fragments!
 
 
 ## Compatibility With Markdown Extensions
@@ -112,6 +114,13 @@ You can also change the output so that all links are inline, which may be easier
 
 > Note: this setting affects image links as well.
 
+
+### Preserve Relative Links
+
+By default, relative links in JSoup are resolved against your base URI (whether explicitly provided or determined automatically when downloading a file). If you'd prefer to keep relative links, you can set the `preserveRelativeLinks` option to `true`.
+
+    Options opts = Options.markdown();
+    opts.preserveRelativeLinks = true;
 
 ### Allowing custom HTML tags
 

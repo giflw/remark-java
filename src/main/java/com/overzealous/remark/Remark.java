@@ -89,6 +89,9 @@ public class Remark {
 									  .addAttributes("th", "colspan", "align", "style")
 									  .addAttributes("td", "colspan", "align", "style")
 									  .addAttributes(":all", "title", "style");
+        if(options.preserveRelativeLinks) {
+            whitelist.preserveRelativeLinks(true);
+        }
 		if(options.abbreviations) {
 			whitelist.addTags("abbr", "acronym");
 		}

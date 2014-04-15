@@ -36,6 +36,7 @@ public class Main {
 		URL urlInput = null;
 		int inputTimeout = 15;
 		String baseURL = "";
+        boolean relative = false;
 		String charset = null;
 		File output = null;
 		boolean html = false;
@@ -69,7 +70,8 @@ public class Main {
 		OutputStreamWriter osw = null;
 		BufferedWriter bw = null;
 		try {
-			fos = new FileOutputStream(myArgs.output);
+            //noinspection IOResourceOpenedButNotSafelyClosed
+            fos = new FileOutputStream(myArgs.output);
 			//noinspection IOResourceOpenedButNotSafelyClosed
 			osw = new OutputStreamWriter(fos, "UTF-8");
 			//noinspection IOResourceOpenedButNotSafelyClosed
@@ -120,6 +122,7 @@ public class Main {
 				checkOutput(cl, result, error);
 				checkInput(cl, result, error);
 				result.html = cl.hasOption("html");
+                result.options.preserveRelativeLinks = result.relative = cl.hasOption("relative");
 			}
 		} catch(ParseException ex) {
 			System.err.println("Unexpected error parsing the command line.");
@@ -163,6 +166,7 @@ public class Main {
 		opts.addOption("o", "output", true, "Name of file to output to; defaults to system out");
 		opts.addOption("timeout", true, "Timeout in seconds for downloading from URLs only; defaults to 15s");
 		opts.addOption("baseurl", true, "Base URL for file inputs, this helps in handling relative links.");
+        opts.addOption("relative", false, "If set, preserve relative URLs.");
 		opts.addOption("charset", true, "Character set for file inputs; defaults to UTF-8.");
 		opts.addOption("html", false, "If set, the cleaned HTML document will be echoed out before conversion.");
 		opts.addOption("h", "help", false, "Displays this help.");
