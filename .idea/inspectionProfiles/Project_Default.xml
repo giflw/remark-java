@@ -46,7 +46,6 @@
     <inspection_tool class="EmptyInitializer" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="EqualsAndHashcode" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ExceptionNameDoesntEndWithException" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="Fix shebang" enabled="true" level="WARNING" enabled_by_default="true">/bin/sh#/bin/bash</inspection_tool>
     <inspection_tool class="FloatingPointEquality" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="HtmlTagCanBeJavadocTag" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="IOResource" enabled="true" level="WARNING" enabled_by_default="true">
@@ -96,9 +95,7 @@
       <option name="m_ignoreSingleCharacterNames" value="true" />
       <option name="m_ignoreOverridesOfLibraryMethods" value="true" />
     </inspection_tool>
-    <inspection_tool class="ParametersPerConstructor" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="m_limit" value="5" />
-    </inspection_tool>
+    <inspection_tool class="ParametersPerConstructor" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ParametersPerMethod" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_limit" value="8" />
     </inspection_tool>
@@ -127,6 +124,7 @@
     <inspection_tool class="UseOfSunClasses" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="W3CssValidation" enabled="true" level="INFO" enabled_by_default="true">
       <option name="myCssVersion" value="css3" />
+      <option name="myIgnoreVendorSpecificProperties" value="false" />
     </inspection_tool>
   </profile>
 </component>
