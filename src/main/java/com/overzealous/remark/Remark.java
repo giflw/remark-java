@@ -81,11 +81,11 @@ public class Remark {
 	public Remark(Options options) {
 		this.options = options.getCopy();
 		Whitelist whitelist = Whitelist.basicWithImages()
-									  .addTags(	      "div",
-													  "h1", "h2", "h3", "h4", "h5", "h6",
-													  "table", "tbody", "td", "tfoot", "th", "thead", "tr",
-													  "hr",
-													  "span", "font")
+									  .addTags("div",
+                                              "h1", "h2", "h3", "h4", "h5", "h6",
+                                              "table", "tbody", "td", "tfoot", "th", "thead", "tr",
+                                              "hr",
+                                              "span", "font")
 									  .addAttributes("th", "colspan", "align", "style")
 									  .addAttributes("td", "colspan", "align", "style")
 									  .addAttributes(":all", "title", "style");
@@ -99,7 +99,9 @@ public class Remark {
 		}
 		for(final IgnoredHtmlElement el : options.getIgnoredHtmlElements()) {
 			whitelist.addTags(el.getTagName());
-			whitelist.addAttributes(el.getTagName(), el.getAttributes().toArray(new String[el.getAttributes().size()]));
+            if(!el.getAttributes().isEmpty()) {
+                whitelist.addAttributes(el.getTagName(), el.getAttributes().toArray(new String[el.getAttributes().size()]));
+            }
 		}
 		cleaner = new Cleaner(whitelist);
 
