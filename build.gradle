@@ -20,7 +20,7 @@ buildscript {
     }
     dependencies {
         //classpath group: 'com.smokejumperit', name: 'gradle-plugins', version: '0.8.2'
-        classpath group: 'org.pegdown', name: 'pegdown', version: '1.+'
+        classpath group: 'org.pegdown', name: 'pegdown', version: '1.5.0'
     }
 }
 
@@ -29,13 +29,31 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.6.+'
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.+'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.6.3'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
     compile group: 'commons-cli', name: 'commons-cli', version: '1.2'
-    testCompile group: 'junit', name: 'junit', version: '4.+'
-    testCompile group: 'commons-io', name: 'commons-io', version: '2.+'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'commons-io', name: 'commons-io', version: '2.4'
 }
-
+//---------------------------------------------------------------------------
+// POM
+//---------------------------------------------------------------------------
+task pom(description: 'Generate pom based on gradle build script') << {
+    pom {
+        project {
+            groupId         'com.overzealous'
+            artifactId      'remark'
+            inceptionYear   '2011'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0'
+                    distribution 'repo'
+                }
+            }
+        }
+    }.writeTo("$projectDir/pom.xml")
+}
 //---------------------------------------------------------------------------
 // Override default tasks
 //---------------------------------------------------------------------------
