@@ -1,4 +1,0 @@
-glob:build/*
-.idea/workspace.xml
-.gradle/*
-.idea/libraries/Gradle_*
