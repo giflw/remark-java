@@ -1,9 +1,13 @@
-[![Build Status](https://travis-ci.org/giflw/remark-java.svg?branch=master)](https://travis-ci.org/giflw/remark-java)
-
-
 # OverZealous Creations Remark
 
 **Remark** is a library for taking (X)HTML input and outputting clean [Markdown][], [Markdown Extra][], or [MultiMarkdown][] compatible text.  The purpose of this conversion is mainly to allow for the use of client-side HTML GUI editors while retaining safe, mobile-device editable markdown text behind the scenes.  It is recommended that the markdown text is stored, to reduce XSS attacks by code injection.
+
+## About this fork
+
+This fork was created in order to convert Maven build system to Gradle and deploy library to Maven Central Repository.
+```groovy
+compile "com.kotcrab.remark:remark:1.0.0"
+```
 
 ## Example Usage Scenario
 
