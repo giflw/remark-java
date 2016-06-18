@@ -49,12 +49,6 @@ compile "com.kotcrab.remark:remark:1.0.0"
 
 The basic theory is that you match the extensions to your Markdown conversion library.
 
-## A Note on Forking:
-
-Want to fork this project?  *Great!*  However, please note that I use [hgflow][] to manage the develop-release cycle.  If you are uncomfortable with that, that's fine, too!  Just switch to the **develop** branch before working, or I won't be able to easily merge the changes back in.
-
-Source code build is done via [Gradle][].
-
 ## Dependencies
 
 **Remark** depends on [jsoup][] and [Apache Commons Lang 3][].  If you want to use it from the command line, it also depends on [Apache Commons CLI][].  Alternatively, you can download the standalone version of the Jar, which contains all the dependencies.
@@ -97,6 +91,5 @@ During testing, **Remark** also depends on some additional libraries, which are 
 [jsoup license]: http://jsoup.org/license
 [Apache Commons Lang 3]: http://commons.apache.org/lang/
 [Apache Commons CLI]: http://commons.apache.org/cli/
-[hgflow]: https://bitbucket.org/yinwm/hgflow/wiki/Home
 [Gradle]: http://gradle.org/
 [Apache 2.0 License]: http://www.apache.org/licenses/LICENSE-2.0
