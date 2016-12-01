@@ -85,8 +85,7 @@ public class Remark {
                                               "h1", "h2", "h3", "h4", "h5", "h6",
                                               "table", "tbody", "td", "tfoot", "th", "thead", "tr",
                                               "hr",
-                                              "span", "font", 
-                                              "s", "strike")
+                                              "span", "font")
 									  .addAttributes("th", "colspan", "align", "style")
 									  .addAttributes("td", "colspan", "align", "style")
 									  .addAttributes(":all", "title", "style");
