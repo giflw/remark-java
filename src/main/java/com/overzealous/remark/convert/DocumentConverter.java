@@ -85,7 +85,7 @@ public class DocumentConverter {
 	}
 
 	private void configureNodes() {
-		addInlineNode(new InlineStyle(),	"i,em,b,strong,font,span,s,strike,del");
+		addInlineNode(new InlineStyle(),	"i,em,b,strong,font,span,s,strike");
 		addInlineNode(new InlineCode(),		"code,tt");
 		addInlineNode(new Image(),			"img");
 		addInlineNode(new Anchor(),			"a");

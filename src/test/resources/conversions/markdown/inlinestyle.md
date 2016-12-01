@@ -19,5 +19,3 @@ Empty, *leading*, ***inline*** and *trailing* spaces.
 *In*WordStyle - In***Word***Style - InWord*Style*
 
 Contains ~~strike through~~ text
-
-Contains ~~strike through~~ text

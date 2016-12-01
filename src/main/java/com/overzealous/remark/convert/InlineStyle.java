@@ -251,7 +251,7 @@ public class InlineStyle extends AbstractNodeHandler {
 	 */
 	private void start(Rules style, String leadingSpaces, DocumentConverter converter) {
 		if(style.addSpacing &&
-				   (italicDepth == 0 || boldDepth == 0) &&
+				   (italicDepth == 0 || boldDepth == 0 || strikeThroughDepth == 0) &&
 				   (leadingSpaces == null || leadingSpaces.length() == 0)) {
 			converter.output.write(' ');
 		}
@@ -296,7 +296,7 @@ public class InlineStyle extends AbstractNodeHandler {
 			}
 		}
 		if(style.addSpacing &&
-					(italicDepth == 0 || boldDepth == 0) &&
+					(italicDepth == 0 || boldDepth == 0 || strikeThroughDepth == 0) &&
 					(trailingSpaces == null || trailingSpaces.length() == 0)) {
 			converter.output.write(' ');
 		}

@@ -86,7 +86,7 @@ public class Remark {
                                               "table", "tbody", "td", "tfoot", "th", "thead", "tr",
                                               "hr",
                                               "span", "font", 
-                                              "s", "strike", "del")
+                                              "s", "strike")
 									  .addAttributes("th", "colspan", "align", "style")
 									  .addAttributes("td", "colspan", "align", "style")
 									  .addAttributes(":all", "title", "style");
