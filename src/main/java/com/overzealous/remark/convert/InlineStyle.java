@@ -32,9 +32,11 @@ public class InlineStyle extends AbstractNodeHandler {
 
 	private static final char ITALICS_WRAPPER = '*';
 	private static final String BOLD_WRAPPER = "**";
+	private static final String STRIKETHROUGH_WRAPPER = "~~";
 
 	private static final Pattern ITALICS_PATTERN = Pattern.compile("font-style:\\s*italic", Pattern.CASE_INSENSITIVE);
 	private static final Pattern BOLD_PATTERN = Pattern.compile("font-weight:\\s*bold", Pattern.CASE_INSENSITIVE);
+	private static final Pattern STRIKE_THROUGH_PATTERN = Pattern.compile("text-decoration:\\s*line-through", Pattern.CASE_INSENSITIVE);
 	
 	private static final Pattern INWORD_CHARACTER = Pattern.compile("\\w");
 	
@@ -42,6 +44,7 @@ public class InlineStyle extends AbstractNodeHandler {
 
 	private int italicDepth = 0;
 	private int boldDepth = 0;
+	private int strikeThroughDepth = 0;
 
 	/**
 	 * Renders inline styling (bold, italics) for the given tag.  It handles implicit styling ({@code em}, {@code strong}) as
@@ -67,7 +70,7 @@ public class InlineStyle extends AbstractNodeHandler {
 			if(rules.emphasisPreserved) {
 				checkTag(node, rules);
 	
-				if(rules.bold || rules.italics) {
+				if(rules.bold || rules.italics || rules.strikeThrough) {
 					handleStyled(parent, node, converter, rules);
 				} else {
 					converter.walkNodes(this, node, converter.inlineNodes);
@@ -76,9 +79,11 @@ public class InlineStyle extends AbstractNodeHandler {
 				// mark as if emphasis was already processed
 				italicDepth++;
 				boldDepth++;
+				strikeThroughDepth++;
 				converter.walkNodes(this, node, converter.inlineNodes);
 				italicDepth--;
 				boldDepth--;
+				strikeThroughDepth--;
 			}
 		}
 	}
@@ -101,6 +106,7 @@ public class InlineStyle extends AbstractNodeHandler {
 		boolean addSpacing = false;
 		boolean italics = false;
 		boolean bold = false;
+		boolean strikeThrough=false;
 	}
 
 	/**
@@ -117,9 +123,11 @@ public class InlineStyle extends AbstractNodeHandler {
 		// prevent double styling
 		if(rules.bold) { boldDepth++; }
 		if(rules.italics) { italicDepth++; }
+		if(rules.strikeThrough) { strikeThroughDepth++; }
 		String content = converter.getInlineContent(this, node, true);
 		if(rules.bold) { boldDepth--; }
 		if(rules.italics) { italicDepth--; }
+		if(rules.strikeThrough) { strikeThroughDepth--; }
 		
 		// only proceed if we have content
 		if(content.length() > 0) {
@@ -215,6 +223,8 @@ public class InlineStyle extends AbstractNodeHandler {
 			rules.italics = (italicDepth == 0);
 		} else if(tn.equals("b") || tn.equals("strong")) {
 			rules.bold = (boldDepth == 0);
+		} else if (tn.equals("s") || tn.equals("strike") || tn.equals("del")) {
+			rules.strikeThrough = (strikeThroughDepth == 0);
 		} else {
 			// check inline-style
 			if(node.hasAttr("style")) {
@@ -224,6 +234,9 @@ public class InlineStyle extends AbstractNodeHandler {
 				}
 				if(BOLD_PATTERN.matcher(style).find()) {
 					rules.bold = (boldDepth == 0);
+				}
+				if(STRIKE_THROUGH_PATTERN.matcher(style).find()) {
+					rules.strikeThrough = (strikeThroughDepth == 0);
 				}
 			}
 		}
@@ -252,6 +265,11 @@ public class InlineStyle extends AbstractNodeHandler {
 				converter.output.write(BOLD_WRAPPER);
 			}
 		}
+		if(style.strikeThrough) {
+			if(strikeThroughDepth == 0) {
+				converter.output.write(STRIKETHROUGH_WRAPPER);
+			}
+		}
 	}
 
 	/**
@@ -270,6 +288,11 @@ public class InlineStyle extends AbstractNodeHandler {
 		if(style.italics) {
 			if(italicDepth == 0) {
 				converter.output.write(ITALICS_WRAPPER);
+			}
+		}
+		if (style.strikeThrough) {
+			if (strikeThroughDepth == 0) {
+				converter.output.write(STRIKETHROUGH_WRAPPER);
 			}
 		}
 		if(style.addSpacing &&
