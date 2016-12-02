@@ -209,6 +209,9 @@ public class InlineStyle extends AbstractNodeHandler {
 				}
 			}
 		}
+		if(node.tagName().equals("del")){
+			result.addSpacing = true;
+		}
 		return result;
 	}
 

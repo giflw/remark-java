@@ -1,5 +1,5 @@
 Division
 
-<strike class="fred">Struck Through</strike>
+<foo-bar class="fred">Foo Bar</foo-bar>
 
 <var><em>Variable</em></var>
