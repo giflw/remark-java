@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.overzealous</groupId>
     <artifactId>remark</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <inceptionYear>2011</inceptionYear>
     <name>Remark</name>
-    <description>Remark is a library for taking (X)HTML input and outputting clean Markdown, Markdown Extra, or MultiMarkdown compatible text.</description>
+    <description>Remark is a library for taking (X)HTML input and outputting clean Markdown, Markdown Extra, or
+        MultiMarkdown compatible text.
+    </description>
     <url>https://bitbucket.org/OverZealous/remark</url>
     <licenses>
         <license>
@@ -31,10 +34,30 @@
             <organization>ITQuasar</organization>
             <organizationUrl>http://itquasar.com</organizationUrl>
             <roles>
-                <role>Developer (migration to maven)</role>
+                <role>Developer</role>
             </roles>
         </developer>
     </developers>
+    <contributors>
+        <contributor>
+            <name>Alex Boyko</name>
+            <properties>
+                <github>https://github.com/BoykoAlex</github>
+            </properties>
+        </contributor>
+    </contributors>
+    <scm>
+        <connection>scm:git:git@github.com:giflw/remark-java.git</connection>
+        <developerConnection>scm:git:git@github.com:giflw/remark-java.git</developerConnection>
+        <url>git@github.com:giflw/remark-java.git</url>
+    </scm>
+    <distributionManagement>
+        <repository>
+            <id>bintray-giflw-maven</id>
+            <name>giflw-maven</name>
+            <url>https://api.bintray.com/maven/giflw/maven/remark-java/;publish=1</url>
+        </repository>
+    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

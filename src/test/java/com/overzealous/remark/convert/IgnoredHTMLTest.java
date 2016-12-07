@@ -30,7 +30,7 @@ public class IgnoredHTMLTest extends RemarkTester {
 	public Remark setupRemark() {
 		Options opts = Options.markdown();
 		opts.getIgnoredHtmlElements().add(IgnoredHtmlElement.create("var"));
-		opts.getIgnoredHtmlElements().add(IgnoredHtmlElement.create("strike", "class"));
+		opts.getIgnoredHtmlElements().add(IgnoredHtmlElement.create("foo-bar", "class"));
 		return new Remark(opts);
 	}
 
