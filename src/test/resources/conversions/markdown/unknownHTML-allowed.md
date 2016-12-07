@@ -1,5 +1,5 @@
 Division
 
-<foo-bar class="fred">Foo Bar</foo-bar>
+<foo-bar class="foo">Foo Bar</foo-bar>
 
 <var><em>Variable</em></var>
