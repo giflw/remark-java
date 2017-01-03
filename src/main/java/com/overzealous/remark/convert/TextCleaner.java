@@ -167,7 +167,7 @@ public class TextCleaner {
 		escapes.add(new Escape(chars.toString(), "\\\\$1"));
 
 		// finally, escape certain characters only if they are leading characters
-		StringBuilder leadingChars = new StringBuilder("^( ?+)([\\Q-+");
+		StringBuilder leadingChars = new StringBuilder("^( ?+)([\\Q+");
 		if(options.definitionLists) {
 			leadingChars.append(':');
 		}
