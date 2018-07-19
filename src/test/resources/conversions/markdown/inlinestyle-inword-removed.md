@@ -17,3 +17,5 @@
 Empty, *leading*, inline and trailing spaces.
 
 InWordStyle - InWordStyle - InWordStyle
+
+Contains ~~strike through~~ text

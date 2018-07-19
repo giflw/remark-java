@@ -1,5 +1,5 @@
 Division
 
-Struck Through
+Foo Bar
 
 *Variable*
