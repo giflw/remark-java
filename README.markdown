@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/giflw/remark-java.svg?branch=master)](https://travis-ci.org/giflw/remark-java)
 
+Original documentation at http://remark.overzealous.com/manual/usage.html.
 
 # OverZealous Creations Remark
 
@@ -45,9 +46,9 @@
 
 The basic theory is that you match the extensions to your Markdown conversion library.
 
-## A Note on Forking:
+## Fork/Build:
 
-Want to fork this project?  *Great!*  However, please note that I use [hgflow][] to manage the develop-release cycle.  If you are uncomfortable with that, that's fine, too!  Just switch to the **develop** branch before working, or I won't be able to easily merge the changes back in.
+Want to fork this project?  *Great!*  However, please note that I use [gitflow][] to manage the develop-release cycle.  If you are uncomfortable with that, that's fine, too!  Just switch to the **develop** branch before working, or I won't be able to easily merge the changes back in.
 
 Source code build is done via [Gradle][].
 
@@ -93,6 +94,6 @@ During testing, **Remark** also depends on some additional libraries, which are 
 [jsoup license]: http://jsoup.org/license
 [Apache Commons Lang 3]: http://commons.apache.org/lang/
 [Apache Commons CLI]: http://commons.apache.org/cli/
-[hgflow]: https://bitbucket.org/yinwm/hgflow/wiki/Home
-[Gradle]: http://gradle.org/
+[gitflow]: https://jeffkreeftmeijer.com/git-flow/
+[Maven]: http://maven.org/
 [Apache 2.0 License]: http://www.apache.org/licenses/LICENSE-2.0
