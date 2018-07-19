@@ -46,6 +46,5 @@ public class MarkdownExtraTest extends RemarkTester {
 	@Test public void testParagraph()		throws Exception { test("paragraph"); }
 	@Test public void testTables()			throws Exception { test("tables", "markdownextra"); }
 	@Test public void testUnknownHTML()		throws Exception { test("unknownHTML"); }
-	@Test public void testBoldWithDash()	throws Exception { test("bold-with-dash"); }
 	
 }
