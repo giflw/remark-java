@@ -73,7 +73,7 @@ public abstract class RemarkTester {
 			System.out.println(converted);
 			System.out.println("==============================");
 		}
-		Assert.assertEquals(expected, converted);
+		Assert.assertEquals("Expected:\n\n" + expected + "\n\nConverted:\n\n" + converted, expected, converted);
 	}
 
 }

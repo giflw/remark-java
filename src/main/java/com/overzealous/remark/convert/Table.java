@@ -30,16 +30,23 @@ import java.util.regex.Pattern;
  */
 public class Table extends AbstractNodeHandler {
 
+	// Largest amount of cells found in a row
+	private int maxRowCells;
+
 	private static final Pattern STYLE_ALIGNMENT_PATTERN =
 				Pattern.compile("text-align:\\s*([a-z]+)", Pattern.CASE_INSENSITIVE);
 
+
 	public void handleNode(NodeHandler parent, Element node, DocumentConverter converter) {
 		MarkdownTable table = new MarkdownTable();
+		boolean hasHeader = false;
+		maxRowCells = 0;
 
 		// loop over every direct child of the table node.
 		for(final Element child : node.children()) {
 
 			if(child.tagName().equals("thead")) {
+				hasHeader = true;
 				// handle explicitly declared header sections
 				for(final Element headerRow : child.children()) {
 					processRow(table.addHeaderRow(), headerRow, converter);
@@ -48,6 +55,7 @@ public class Table extends AbstractNodeHandler {
 			} else if(child.tagName().equals("tbody") || child.tagName().equals("tfoot")) {
 				// handle body or foot sections - note: there's no special handling for tfoot
 				for(final Element bodyRow : child.children()) {
+					updateMaxRowCells(bodyRow);
 					processRow(table.addBodyRow(), bodyRow, converter);
 				}
 
@@ -55,16 +63,21 @@ public class Table extends AbstractNodeHandler {
 				// Hrm, a row was added outside a valid table body or header...
 				if(!child.children().isEmpty()) {
 					if(child.children().get(0).tagName().equals("th")) {
+						hasHeader = true;
 						// handle manual TH cells
 						processRow(table.addHeaderRow(), child, converter);
-
 					} else {
 						// OK, must be a table row.
+						updateMaxRowCells(child);
 						processRow(table.addBodyRow(), child, converter);
-
 					}
 				}
 			}
+		}
+	
+		if(!hasHeader) {
+			// No header was created, need to insert an empty one for markdown to work
+			insertEmptyRow(table.addHeaderRow(), maxRowCells);
 		}
 
 		// OK, now render this sucker
@@ -78,6 +91,12 @@ public class Table extends AbstractNodeHandler {
 		for(final Element cell : tableRow.children()) {
 			String contents = converter.getInlineContent(this, cell, true);
 			row.add(new MarkdownTableCell(contents, getAlignment(cell), getColspan(cell)));
+		}
+	}
+
+	private void insertEmptyRow(List<MarkdownTableCell> row, int numberOfCells) {
+		for(int i = 0; i < numberOfCells; i++) {
+			row.add(new MarkdownTableCell("", MarkdownTable.Alignment.LEFT));
 		}
 	}
 
@@ -112,5 +131,16 @@ public class Table extends AbstractNodeHandler {
 			}
 		}
 		return colspan;
+	}
+
+	/**
+	* Updates maxRowCells with the value of the larger amount of cells
+	* @param row
+	*/
+	private void updateMaxRowCells(Element row) {
+		int currentRowCells = row.children().size();
+		if(currentRowCells > maxRowCells) {
+			maxRowCells = currentRowCells;
+		}
 	}
 }
