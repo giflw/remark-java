@@ -6,7 +6,7 @@
 
 This fork was created in order to convert Maven build system to Gradle and deploy library to Maven Central Repository.
 ```groovy
-compile "com.kotcrab.remark:remark:1.0.0"
+implementation "com.kotcrab.remark:remark:1.1.0"
 ```
 
 ## Example Usage Scenario
