@@ -27,6 +27,36 @@
 </table>
 
 <table> 
+ <tbody>
+  <tr> 
+   <th>Header 1</th> 
+   <th>Header 2</th> 
+  </tr> 
+  <tr> 
+   <td>One</td> 
+   <td>Two</td> 
+  </tr> 
+ </tbody>
+</table>
+
+<table> 
+ <tbody>
+  <tr> 
+   <th>Header 1</th> 
+   <th>Header 2</th> 
+  </tr> 
+  <tr> 
+   <td>One</td> 
+   <td>Two</td> 
+  </tr> 
+  <tr> 
+   <th>Header A</th> 
+   <th>Header B</th> 
+  </tr> 
+ </tbody>
+</table>
+
+<table> 
  <thead>
   <tr>
    <th>head 1</th>

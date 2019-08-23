@@ -32,49 +32,19 @@ public class Table extends AbstractNodeHandler {
 
 	// Largest amount of cells found in a row
 	private int maxRowCells;
+	private boolean hasHeader;
 
-	private static final Pattern STYLE_ALIGNMENT_PATTERN =
-				Pattern.compile("text-align:\\s*([a-z]+)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern STYLE_ALIGNMENT_PATTERN = Pattern.compile("text-align:\\s*([a-z]+)",
+			Pattern.CASE_INSENSITIVE);
 
 
 	public void handleNode(NodeHandler parent, Element node, DocumentConverter converter) {
 		MarkdownTable table = new MarkdownTable();
-		boolean hasHeader = false;
+		hasHeader = false;
 		maxRowCells = 0;
 
-		// loop over every direct child of the table node.
-		for(final Element child : node.children()) {
+		processTable(table, node, converter);
 
-			if(child.tagName().equals("thead")) {
-				hasHeader = true;
-				// handle explicitly declared header sections
-				for(final Element headerRow : child.children()) {
-					processRow(table.addHeaderRow(), headerRow, converter);
-				}
-
-			} else if(child.tagName().equals("tbody") || child.tagName().equals("tfoot")) {
-				// handle body or foot sections - note: there's no special handling for tfoot
-				for(final Element bodyRow : child.children()) {
-					updateMaxRowCells(bodyRow);
-					processRow(table.addBodyRow(), bodyRow, converter);
-				}
-
-			} else if(child.tagName().equals("tr")) {
-				// Hrm, a row was added outside a valid table body or header...
-				if(!child.children().isEmpty()) {
-					if(child.children().get(0).tagName().equals("th")) {
-						hasHeader = true;
-						// handle manual TH cells
-						processRow(table.addHeaderRow(), child, converter);
-					} else {
-						// OK, must be a table row.
-						updateMaxRowCells(child);
-						processRow(table.addBodyRow(), child, converter);
-					}
-				}
-			}
-		}
-	
 		if(!hasHeader) {
 			// No header was created, need to insert an empty one for markdown to work
 			insertEmptyRow(table.addHeaderRow(), maxRowCells);
@@ -85,6 +55,43 @@ public class Table extends AbstractNodeHandler {
 		converter.output.startBlock();
 		table.renderTable(converter.output, opts.isColspanEnabled(), opts.isRenderedAsCode());
 		converter.output.endBlock();
+	}
+
+	private void processTable(MarkdownTable table, Element node, DocumentConverter converter) {
+		// loop over every direct child of the table node.
+		for(final Element child : node.children()) {
+			String childTagName = child.tagName();
+			if(childTagName.equals("thead")) {
+				hasHeader = true;
+				// handle explicitly declared header sections
+				for(final Element headerRow : child.children()) {
+					processRow(table.addHeaderRow(), headerRow, converter);
+				}
+
+			} else if(childTagName.equals("tbody") || childTagName.equals("tfoot")) {
+				// Chance there are headers in body/footer need to go inside to verify.
+				processTable(table, child, converter);
+			} else if (childTagName.equals("tr")) {
+				// Hrm, a row was added outside a valid table body or header...
+				if(!child.children().isEmpty()) {
+					if(child.children().get(0).tagName().equals("th")) {
+						if(hasHeader == true) {
+							// already has header, treat this as a regular body row
+							processRow(table.addBodyRow(), child, converter);	
+						} else {
+							hasHeader = true;
+							// handle manual TH cells
+							processRow(table.addHeaderRow(), child, converter);
+						}
+						
+					} else {
+						// OK, must be a table row.
+						updateMaxRowCells(child);
+						processRow(table.addBodyRow(), child, converter);
+					}
+				}
+			}
+		}
 	}
 
 	private void processRow(List<MarkdownTableCell> row, Element tableRow, DocumentConverter converter) {
