@@ -11,6 +11,7 @@ buildscript {
     dependencies {
         classpath "com.netflix.nebula:gradle-extra-configurations-plugin:3.0.3"
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
+        classpath "biz.aQute.bnd:biz.aQute.bnd.gradle:5.1.2"
     }
 }
 
@@ -26,6 +27,7 @@ apply plugin: "idea"
 apply plugin: "java"
 apply plugin: 'maven'
 apply plugin: "nebula.optional-base"
+apply plugin: "biz.aQute.bnd.builder"
 apply from: 'deploy.gradle'
 
 archivesBaseName = "remark"
