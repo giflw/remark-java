@@ -55,9 +55,9 @@ public class Image extends AbstractNodeHandler {
 			}
 			BlockWriter out = converter.output;
 			if(alt.equals(linkId)) {
-				out.printf("![%s][]", linkId);
+				out.printf("![%s](%s)", linkId, url);
 			} else {
-				out.printf("![%s][%s]", alt, linkId);
+				out.printf("![%s](%s)", alt, url);
 			}
 		}
 	}

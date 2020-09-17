@@ -61,9 +61,9 @@ public class Anchor extends AbstractNodeHandler {
 					}
 					String linkId = converter.addLink(url, label, false);
 					if(label.equals(linkId)) {
-						converter.output.printf("[%s][]", label);
+						converter.output.printf("[%s](%s)", label, url);
 					} else {
-						converter.output.printf("[%s][%s]", label, linkId);
+						converter.output.printf("[%s](%s)", label, url);
 					}
 				}
 			} // else, ignore links with no label

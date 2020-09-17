@@ -263,7 +263,7 @@ public class DocumentConverter {
 
 		// walk the DOM
 		walkNodes(DefaultNodeHandler.getInstance(), doc.body(), blockNodes);
-
+/*
 		if(!linkIds.isEmpty()) {
 			// Add links
 			output.startBlock();
@@ -280,7 +280,7 @@ public class DocumentConverter {
 			}
 			output.endBlock();
 		}
-
+*/
 		// free up unused properties
 		linkIds = null;
 		linkUrls = null;
