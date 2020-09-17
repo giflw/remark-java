@@ -35,12 +35,22 @@ public class Header extends AbstractNodeHandler {
 	 * @param converter Parent converter for this object.
 	 */
 	public void handleNode(NodeHandler parent, Element node, DocumentConverter converter) {
+		String inlineContent = converter.getInlineContent(this, node);
+		if (inlineContent == null) {
+		    return;
+		}
+		inlineContent = inlineContent.trim();
+		inlineContent = inlineContent.replace("\n", " ");
+		if (inlineContent.isEmpty()) {
+		    return;
+		}
+		
 		int depth = Integer.parseInt(node.tagName().substring(1, 2));
 		BlockWriter out = converter.output;
 		out.startBlock();
 		StringUtils.multiply(out, '#', depth);
 		out.print(' ');
-		out.print(converter.getInlineContent(this, node).replace("\n", " "));
+		out.print(inlineContent);
 		out.print(' ');
 		StringUtils.multiply(out, '#', depth);
 		if(converter.options.headerIds && node.hasAttr("id")) {
