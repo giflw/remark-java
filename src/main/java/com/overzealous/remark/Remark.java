@@ -20,7 +20,7 @@ import com.overzealous.remark.convert.DocumentConverter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Cleaner;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,7 +80,7 @@ public class Remark {
 	 */
 	public Remark(Options options) {
 		this.options = options.getCopy();
-		Whitelist whitelist = Whitelist.basicWithImages()
+		Safelist whitelist = Safelist.basicWithImages()
 									  .addTags("div",
                                               "h1", "h2", "h3", "h4", "h5", "h6",
                                               "table", "tbody", "td", "tfoot", "th", "thead", "tr",
